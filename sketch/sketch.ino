@@ -77,12 +77,14 @@ const char index_html[] PROGMEM = R"rawliteral(
             background-color: #2196F3; /* Green */
             border: none;
             color: white;
-            padding: 6%;
+            padding: 0.4%;
             text-align: center;
             text-decoration: none;
             display: inline-block;
-            font-size: 30px;
+            font-size: 20px;
+            width: 140px;
             transform: scale(1);
+            margin-bottom: 10px;
         }
         .button-group {
             position: relative;
@@ -97,17 +99,21 @@ const char index_html[] PROGMEM = R"rawliteral(
         }
         #settingbutton {
             position: relative;
-            transform: scale(0.06);
-            margin-top: -250px;
-            margin-right: -70%;
-            text-align: right;
-            margin-bottom: 20px;
+            width: 100%;
+            left: 25%;
+            text-align: center;
+            transform: scale(0.04);
+            margin-top: -300px;
         }
         #setting {
             position: relative;
             text-align: center;
             background-color: Transparent;
-            border: none;
+            border:none;
+        }
+        .valuesButtons {
+        margin-top: 0%;
+        font-size: 15px;
         }
     </style>
     <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
@@ -138,14 +144,14 @@ const char index_html[] PROGMEM = R"rawliteral(
         <p>Geschwindigkeit:</p>
     </div>
     <div class=button-group>
-    <button class="button">1</button>
-    <button class="button">2</button>
-    <button class="button">3</button>
-    <button class="button">4</button>
-    <button class="button">5</button>
+    <button class="button">1<h2 class="valuesButtons">40ms</h2></button>
+    <button class="button">2<h2 class="valuesButtons">20ms</h2></button>
+    <button class="button">3<h2 class="valuesButtons">2ms</h2></button>
+    <button class="button">4<h2 class="valuesButtons">10ms</h2></button>
+    <button class="button">5<h2 class="valuesButtons">9ms</h2></button>
     </div>
     <div id="settingbutton">
-    <button id="setting" onclick="myFunction()"><img src="https://raw.githubusercontent.com/eleminer/AquariumStroemungspumpeWinkel/master/settingPicture.png"></button>
+    <button id="setting" onclick="myFunction()"><img src="https://raw.githubusercontent.com/eleminer/AquariumStroemungspumpeWinkel/master/settingPicture.png"></button> 
     </div>
     <script>
     function alert()
