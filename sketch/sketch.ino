@@ -124,12 +124,19 @@ const char index_html[] PROGMEM = R"rawliteral(
         <p>Geschwindigkeit:</p>
     </div>
     <div class=button-group>
-    <button class="button">1</button>
+    <button onclick="alert()" class="button">1</button>
     <button class="button">2</button>
     <button class="button">3</button>
     <button class="button">4</button>
     <button class="button">5</button>
     </div>
+
+    <script>
+    function alert()
+    {
+        prompt("Enter something!", "Text");
+    }
+    </script>
 </body>
 </html>
 )rawliteral";
