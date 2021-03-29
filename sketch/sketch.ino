@@ -145,12 +145,29 @@ const char index_html[] PROGMEM = R"rawliteral(
     <button class="button">5<h2 class="valuesButtons">9ms</h2></button>
     </div>
     <div id="settingbutton">
-    <button id="setting" onclick="myFunction()"><img src="https://raw.githubusercontent.com/eleminer/AquariumStroemungspumpeWinkel/master/settingPicture.png"height="20%" width="20%"></button> 
+    <button id="setting" onclick="alert()"><img src="https://raw.githubusercontent.com/eleminer/AquariumStroemungspumpeWinkel/master/settingPicture.png"height="20%" width="20%"></button> 
     </div>
     <script>
-    function alert()
+        function alert()
     {
-        prompt("Enter something!", "Text");
+        var buttonnumber = prompt("Einstellungen Button (Nummer???)", "1");
+        switch (buttonnumber)
+        {
+            case "1":
+            prompt("Millisekunden von 1:", "50");
+            break;
+            case "2":
+            prompt("Millisekunden von 2:", "50");
+            break;
+            case "3":
+            prompt("Millisekunden von 3:", "50");
+            break;
+            case "4":
+            prompt("Millisekunden von 4:", "50");
+            break;
+            default: 
+            break;
+        }
     }
     </script>
 </body>
