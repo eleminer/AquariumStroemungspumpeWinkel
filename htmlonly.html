@@ -74,13 +74,27 @@
         .button-group {
             position: relative;
             margin-top: 10px;
-            margin-bottom: 10px;
+            margin-bottom: 0px;
             text-align: center;
         }
         #speedDIV {
             position: relative;
             margin-top: 100px;
             text-align: center;
+        }
+        #settingbutton {
+            position: relative;
+            transform: scale(0.06);
+            margin-top: -250px;
+            margin-right: -70%;
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        #setting {
+            position: relative;
+            text-align: center;
+            background-color: Transparent;
+            border: none;
         }
     </style>
     <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
@@ -117,7 +131,9 @@
     <button class="button">4</button>
     <button class="button">5</button>
     </div>
-
+    <div id="settingbutton">
+    <button id="setting" onclick="myFunction()"><img src="https://raw.githubusercontent.com/eleminer/AquariumStroemungspumpeWinkel/master/settingPicture.png"></button>
+    </div>
     <script>
     function alert()
     {
