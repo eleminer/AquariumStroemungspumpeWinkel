@@ -99,15 +99,11 @@ const char index_html[] PROGMEM = R"rawliteral(
         }
         #settingbutton {
             position: relative;
-            width: 100%;
             left: 25%;
-            text-align: center;
             transform: scale(0.04);
             margin-top: -300px;
         }
         #setting {
-            position: relative;
-            text-align: center;
             background-color: Transparent;
             border:none;
         }
