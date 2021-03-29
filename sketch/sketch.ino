@@ -17,7 +17,7 @@ const char index_html[] PROGMEM = R"rawliteral(
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         #angle-min, #angle-max {
-            color: blue;
+            color: #2196F3;
         }
         .switch {
             position: relative;
@@ -71,9 +71,31 @@ const char index_html[] PROGMEM = R"rawliteral(
         }
         #onoffdiv {
             margin-top: 6px;
+            margin-left: 6px;
+        }
+        .button {
+            background-color: #2196F3; /* Green */
+            border: none;
+            color: white;
+            padding: 5% 5%;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 30px;
+            transform: scale(1);
+        }
+        .button-group {
+            position: relative;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        #speedDIV {
+            position: relative;
+            margin-top: 100px;
+            text-align: center;
         }
     </style>
-
     <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
     <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
@@ -81,7 +103,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 <body>
     <div data-role="page">
         <div data-role="header">
-            <h1>Stroemungspumpe</h1>
+            <h1>Pumpe</h1>
         </div>
         <div data-role="main" class="ui-content">
             <div data-role="rangeslider">
@@ -96,9 +118,18 @@ const char index_html[] PROGMEM = R"rawliteral(
     <label class="switch">
         <input type="checkbox">
         <span class="slider round"></span>
-
-    </div>
     </label>
+    </div>
+    <div id=speedDIV>
+        <p>Geschwindigkeit:</p>
+    </div>
+    <div class=button-group>
+    <button class="button">1</button>
+    <button class="button">2</button>
+    <button class="button">3</button>
+    <button class="button">4</button>
+    <button class="button">5</button>
+    </div>
 </body>
 </html>
 )rawliteral";
