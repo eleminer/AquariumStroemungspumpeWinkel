@@ -67,7 +67,7 @@ const char index_html[] PROGMEM = R"rawliteral(
             border-radius: 34px;
         }
         .slider.round:before {
-            border-radius: 50%;
+            border-radius: 50px;
         }
         #onoffdiv {
             margin-top: 6px;
@@ -77,7 +77,7 @@ const char index_html[] PROGMEM = R"rawliteral(
             background-color: #2196F3; /* Green */
             border: none;
             color: white;
-            padding: 5% 5%;
+            padding: 6%;
             text-align: center;
             text-decoration: none;
             display: inline-block;
