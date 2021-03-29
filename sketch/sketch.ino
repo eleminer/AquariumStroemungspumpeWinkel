@@ -99,9 +99,7 @@ const char index_html[] PROGMEM = R"rawliteral(
         }
         #settingbutton {
             position: relative;
-            left: 25%;
-            transform: scale(0.04);
-            margin-top: -300px;
+            text-align: center;
         }
         #setting {
             background-color: Transparent;
@@ -147,7 +145,7 @@ const char index_html[] PROGMEM = R"rawliteral(
     <button class="button">5<h2 class="valuesButtons">9ms</h2></button>
     </div>
     <div id="settingbutton">
-    <button id="setting" onclick="myFunction()"><img src="https://raw.githubusercontent.com/eleminer/AquariumStroemungspumpeWinkel/master/settingPicture.png"></button> 
+    <button id="setting" onclick="myFunction()"><img src="https://raw.githubusercontent.com/eleminer/AquariumStroemungspumpeWinkel/master/settingPicture.png"height="20%" width="20%"></button> 
     </div>
     <script>
     function alert()
