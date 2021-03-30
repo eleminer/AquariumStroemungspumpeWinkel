@@ -8,6 +8,13 @@ const char *PARAM_INPUT = "value";
 const int output = 2;
 String sliderValue = "0";
 
+
+String speedfirstButton="50";
+String speedsecondButton="1";
+String speedthirdButton="2";
+String speedfourButton="3";
+String speedfiveButton="4";
+
 AsyncWebServer server(80);
 
 const char index_html[] PROGMEM = R"rawliteral(
@@ -138,17 +145,27 @@ const char index_html[] PROGMEM = R"rawliteral(
         <p>Geschwindigkeit:</p>
     </div>
     <div class=button-group>
-    <button class="button">1<h2 class="valuesButtons">40ms</h2></button>
-    <button class="button">2<h2 class="valuesButtons">20ms</h2></button>
-    <button class="button">3<h2 class="valuesButtons">2ms</h2></button>
-    <button class="button">4<h2 class="valuesButtons">10ms</h2></button>
-    <button class="button">5<h2 class="valuesButtons">9ms</h2></button>
+    <button class="button">1<h2 id="speedbuttonone" class="valuesButtons">%One%</h2></button>
+    <button class="button">2<h2 id="speedbuttontwo" class="valuesButtons">%Two%</h2></button>
+    <button class="button">3<h2  id="speedbuttonthree" class="valuesButtons">%Three%</h2></button>
+    <button class="button">4<h2 id="speedbuttonfour" class="valuesButtons">%Four%</h2></button>
+    <button class="button">5<h2 id="speedbuttonfive" class="valuesButtons">%Five%</h2></button>
     </div>
     <div id="settingbutton">
     <button id="setting" onclick="alert()"><img src="https://raw.githubusercontent.com/eleminer/AquariumStroemungspumpeWinkel/master/settingPicture.png"height="20%" width="20%"></button> 
     </div>
     <script>
-        function alert()
+    setInterval(update, 500)
+    function update()
+    {
+    document.getElementById("speedbuttonone").innerHTML = %SPEEDFIRSTBUTTON%+"ms";
+    document.getElementById("speedbuttontwo").innerHTML = %SPEEDSECONDBUTTON%+"ms";
+    document.getElementById("speedbuttonthree").innerHTML = %SPEEDTHIRDBUTTON%+"ms";
+    document.getElementById("speedbuttonfour").innerHTML = %SPEEDFOURBUTTON%+"ms";
+    document.getElementById("speedbuttonfive").innerHTML = %SPEEDFIVEBUTTON%+"ms";
+    }
+
+    function alert()
     {
         var buttonnumber = prompt("Einstellungen Button (Nummer???)", "1");
         switch (buttonnumber)
@@ -168,6 +185,8 @@ const char index_html[] PROGMEM = R"rawliteral(
             default: 
             break;
         }
+
+
     }
     </script>
 </body>
@@ -179,6 +198,27 @@ String processor(const String &var)
   {
     return sliderValue;
   }
+  if (var == "SPEEDFIRSTBUTTON")
+  {
+    return speedfirstButton;
+  }
+  if (var == "SPEEDSECONDBUTTON")
+  {
+    return speedsecondButton;
+  }
+  if (var == "SPEEDTHIRDBUTTON")
+  {
+    return speedthirdButton;
+  }
+  if (var == "SPEEDFOURBUTTON")
+  {
+    return speedfourButton;
+  }
+  if (var == "SPEEDFIVEBUTTON")
+  {
+    return speedfiveButton;
+  }
+  
   return String();
 }
 
