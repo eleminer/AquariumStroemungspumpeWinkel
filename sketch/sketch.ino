@@ -140,7 +140,7 @@ const char index_html[] PROGMEM = R"rawliteral(
     </div>
     <div id="onoffdiv">
     <label class="switch">
-        <input id="onoff" type="checkbox">
+        <input onclick="powerbutton()" id="onoff" type="checkbox">
         <span class="slider round"></span>
     </label>
     </div>
@@ -158,6 +158,20 @@ const char index_html[] PROGMEM = R"rawliteral(
     <button id="setting" onclick="alert()"><img src="https://raw.githubusercontent.com/eleminer/AquariumStroemungspumpeWinkel/master/settingPicture.png"height="20%" width="20%"></button> 
     </div>
     <script>
+    function powerbutton()
+    {
+    if (onoff.checked != true)
+    {
+    var value = 0;
+    }
+    else
+    {
+    var value = 1;
+    }
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/power?value="+value, true);
+    xhr.send();
+    }
     function setMin()
     {
     var value = document.getElementById("minSlider").value;
@@ -292,6 +306,19 @@ void setup()
       inputMessage = request->getParam(PARAM_INPUT)->value();
       maxValueAngle = inputMessage;
       Serial.println("MAX:"+maxValueAngle+"MIN:"+minValueAngle);
+    }
+    else {
+      inputMessage = "No message sent";
+    }
+    Serial.println(inputMessage);
+    request->send(200, "text/plain", "OK");
+  });
+
+    server.on("/power", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    String inputMessage;
+    if (request->hasParam(PARAM_INPUT)) {
+      inputMessage = request->getParam(PARAM_INPUT)->value();
+      status = inputMessage;
     }
     else {
       inputMessage = "No message sent";
