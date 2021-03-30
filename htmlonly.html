@@ -109,15 +109,15 @@
         <div data-role="main" class="ui-content">
             <div data-role="rangeslider">
                 <label for="price-min">Winkel:</label>
-                <input type="range" name="angle-min" id="angle-min" value="45" min="0" max="180">
+                <input type="range" name="angle-min" id="angle-min" value="%MINVALUEANGLE%" min="0" max="180">
                 <label for="angle-max">Winkel:</label>
-                <input type="range" name="angle-max" id="angle-max" value="135" min="0" max="180">
+                <input type="range" name="angle-max" id="angle-max" value="%MAXVALUEANGLE%"  min="0" max="180">
             </div>
         </div>
     </div>
     <div id="onoffdiv">
     <label class="switch">
-        <input type="checkbox">
+        <input id="onoff" type="checkbox">
         <span class="slider round"></span>
     </label>
     </div>
@@ -135,19 +135,22 @@
     <button id="setting" onclick="alert()"><img src="https://raw.githubusercontent.com/eleminer/AquariumStroemungspumpeWinkel/master/settingPicture.png"height="20%" width="20%"></button> 
     </div>
     <script>
-    test();
-    function test()
+
+    function update()
     {
-        console.log("hello");
+    document.getElementById("speedbuttonone").innerHTML = %SPEEDFIRSTBUTTON%+"ms";
+    document.getElementById("speedbuttontwo").innerHTML = %SPEEDSECONDBUTTON%+"ms";
+    document.getElementById("speedbuttonthree").innerHTML = %SPEEDTHIRDBUTTON%+"ms";
+    document.getElementById("speedbuttonfour").innerHTML = %SPEEDFOURBUTTON%+"ms";
+    document.getElementById("speedbuttonfive").innerHTML = %SPEEDFIVEBUTTON%+"ms";
+    if (%STATUS%==1)
+    {
+    document.getElementById("onoff").checked = true;
     }
-    //setValues();
-    function setValues()
+    else
     {
-        document.getElementById("speedbuttonone").innerHTML = speedfirstbutton;
-        document.getElementById("speedbuttontwo").innerHTML = speedsecondButton;
-        document.getElementById("speedbuttonthree").innerHTML = speedthirdButton;
-        document.getElementById("speedbuttonfour").innerHTML = speedfourButton;
-        document.getElementById("speedbuttonfive").innerHTML = speedfiveButton;
+         document.getElementById("onoff").checked = false;
+    }
     }
     function alert()
     {
@@ -155,21 +158,28 @@
         switch (buttonnumber)
         {
             case "1":
-            prompt("Millisekunden von 1:", "50");
+            var temp=prompt("Millisekunden von 1:", "50");
             break;
             case "2":
-            prompt("Millisekunden von 2:", "50");
+            var temp=prompt("Millisekunden von 2:", "50");
             break;
             case "3":
-            prompt("Millisekunden von 3:", "50");
+            var temp=prompt("Millisekunden von 3:", "50");
             break;
             case "4":
-            prompt("Millisekunden von 4:", "50");
+            var temp=prompt("Millisekunden von 4:", "50");
+            break;
+            case "5":
+            var temp=prompt("Millisekunden von 5:", "50");
             break;
             default: 
             break;
         }
     }
+
+window.addEventListener("load", function(){
+console.log("hallo");
+});
     </script>
 </body>
 </html>

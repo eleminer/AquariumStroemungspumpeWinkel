@@ -4,9 +4,6 @@
 
 const char *ssid = "Develop";
 const char *password = "384783478";
-const char *PARAM_INPUT = "value";
-const int output = 2;
-String sliderValue = "0";
 
 
 String speedfirstButton="50";
@@ -14,6 +11,9 @@ String speedsecondButton="1";
 String speedthirdButton="2";
 String speedfourButton="3";
 String speedfiveButton="4";
+String maxValueAngle="160";
+String minValueAngle="10";
+String status="1";
 
 AsyncWebServer server(80);
 
@@ -121,7 +121,7 @@ const char index_html[] PROGMEM = R"rawliteral(
     <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
 </head>
-<body>
+<body onload="update()">
     <div data-role="page">
         <div data-role="header">
             <h1>Pumpe Winkel</h1>
@@ -129,15 +129,15 @@ const char index_html[] PROGMEM = R"rawliteral(
         <div data-role="main" class="ui-content">
             <div data-role="rangeslider">
                 <label for="price-min">Winkel:</label>
-                <input type="range" name="angle-min" id="angle-min" value="45" min="0" max="180">
+                <input type="range" name="angle-min" id="angle-min" value="%MINVALUEANGLE%" min="0" max="180">
                 <label for="angle-max">Winkel:</label>
-                <input type="range" name="angle-max" id="angle-max" value="135" min="0" max="180">
+                <input type="range" name="angle-max" id="angle-max" value="%MAXVALUEANGLE%"  min="0" max="180">
             </div>
         </div>
     </div>
     <div id="onoffdiv">
     <label class="switch">
-        <input type="checkbox">
+        <input id="onoff" type="checkbox">
         <span class="slider round"></span>
     </label>
     </div>
@@ -155,7 +155,7 @@ const char index_html[] PROGMEM = R"rawliteral(
     <button id="setting" onclick="alert()"><img src="https://raw.githubusercontent.com/eleminer/AquariumStroemungspumpeWinkel/master/settingPicture.png"height="20%" width="20%"></button> 
     </div>
     <script>
-    setInterval(update, 500)
+
     function update()
     {
     document.getElementById("speedbuttonone").innerHTML = %SPEEDFIRSTBUTTON%+"ms";
@@ -163,40 +163,57 @@ const char index_html[] PROGMEM = R"rawliteral(
     document.getElementById("speedbuttonthree").innerHTML = %SPEEDTHIRDBUTTON%+"ms";
     document.getElementById("speedbuttonfour").innerHTML = %SPEEDFOURBUTTON%+"ms";
     document.getElementById("speedbuttonfive").innerHTML = %SPEEDFIVEBUTTON%+"ms";
+    if (%STATUS%==1)
+    {
+    document.getElementById("onoff").checked = true;
     }
-
+    else
+    {
+         document.getElementById("onoff").checked = false;
+    }
+    }
     function alert()
     {
         var buttonnumber = prompt("Einstellungen Button (Nummer???)", "1");
         switch (buttonnumber)
         {
             case "1":
-            prompt("Millisekunden von 1:", "50");
+            var temp=prompt("Millisekunden von 1:", "50");
             break;
             case "2":
-            prompt("Millisekunden von 2:", "50");
+            var temp=prompt("Millisekunden von 2:", "50");
             break;
             case "3":
-            prompt("Millisekunden von 3:", "50");
+            var temp=prompt("Millisekunden von 3:", "50");
             break;
             case "4":
-            prompt("Millisekunden von 4:", "50");
+            var temp=prompt("Millisekunden von 4:", "50");
+            break;
+            case "5":
+            var temp=prompt("Millisekunden von 5:", "50");
             break;
             default: 
             break;
         }
-
-
     }
+
     </script>
 </body>
 </html>
 )rawliteral";
 String processor(const String &var)
 {
-  if (var == "SLIDERVALUE")
+    if (var == "STATUS")
   {
-    return sliderValue;
+    return status;
+  }
+    if (var == "MINVALUEANGLE")
+  {
+    return minValueAngle;
+  }
+    if (var == "MAXVALUEANGLE")
+  {
+    return maxValueAngle;
   }
   if (var == "SPEEDFIRSTBUTTON")
   {
@@ -225,7 +242,6 @@ String processor(const String &var)
 void setup()
 {
   Serial.begin(115200);
-  analogWrite(2, sliderValue.toInt());
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED)
@@ -234,28 +250,10 @@ void setup()
   }
   Serial.println(WiFi.localIP());
 
-  // Route for root / web page
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send_P(200, "text/html", index_html, processor);
   });
 
-  // Send a GET request to <ESP_IP>/slider?value=<inputMessage>
-  server.on("/slider", HTTP_GET, [](AsyncWebServerRequest *request) {
-    String inputMessage;
-    // GET input1 value on <ESP_IP>/slider?value=<inputMessage>
-    if (request->hasParam(PARAM_INPUT))
-    {
-      inputMessage = request->getParam(PARAM_INPUT)->value();
-      sliderValue = inputMessage;
-      analogWrite(output, sliderValue.toInt());
-    }
-    else
-    {
-      inputMessage = "No message sent";
-    }
-    Serial.println(inputMessage);
-    request->send(200, "text/plain", "OK");
-  });
   server.begin();
 }
 
