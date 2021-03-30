@@ -14,6 +14,7 @@ String speedfiveButton="4";
 String maxValueAngle="160";
 String minValueAngle="10";
 String status="1";
+String selection="1";
 
 
 const char* PARAM_INPUT = "value";
@@ -148,16 +149,71 @@ const char index_html[] PROGMEM = R"rawliteral(
         <p>Geschwindigkeit:</p>
     </div>
     <div class=button-group>
-    <button class="button">1<h2 id="speedbuttonone" class="valuesButtons">%One%</h2></button>
-    <button class="button">2<h2 id="speedbuttontwo" class="valuesButtons">%Two%</h2></button>
-    <button class="button">3<h2  id="speedbuttonthree" class="valuesButtons">%Three%</h2></button>
-    <button class="button">4<h2 id="speedbuttonfour" class="valuesButtons">%Four%</h2></button>
-    <button class="button">5<h2 id="speedbuttonfive" class="valuesButtons">%Five%</h2></button>
+    <button onclick="buttonchange(1)" class="button">1<h2 id="speedbuttonone" class="valuesButtons">%One%</h2></button>
+    <button onclick="buttonchange(2)" class="button">2<h2 id="speedbuttontwo" class="valuesButtons">%Two%</h2></button>
+    <button onclick="buttonchange(3)" class="button">3<h2  id="speedbuttonthree" class="valuesButtons">%Three%</h2></button>
+    <button onclick="buttonchange(4)" class="button">4<h2 id="speedbuttonfour" class="valuesButtons">%Four%</h2></button>
+    <button onclick="buttonchange(5)" class="button">5<h2 id="speedbuttonfive" class="valuesButtons">%Five%</h2></button>
     </div>
     <div id="settingbutton">
     <button id="setting" onclick="alert()"><img src="https://raw.githubusercontent.com/eleminer/AquariumStroemungspumpeWinkel/master/settingPicture.png"height="20%" width="20%"></button> 
     </div>
     <script>
+    function buttonchange(buttonnumber)
+    {
+    var i=1;
+    while (i<=5)
+    {
+      if(i==buttonnumber)
+      {
+        switch (i)
+        {
+          case 1:
+          (document.getElementById("speedbuttonone")).style.backgroundColor = "red";
+          break;
+          case 2:
+          (document.getElementById("speedbuttontwo")).style.backgroundColor = "red";
+          break;
+          case 3:
+          (document.getElementById("speedbuttonthree")).style.backgroundColor = "red";
+          break;
+          case 4:
+          (document.getElementById("speedbuttonfour")).style.backgroundColor = "red";
+          break;
+          case 5:
+          (document.getElementById("speedbuttonfive")).style.backgroundColor = "red";
+          break;
+        }
+
+      }
+      else
+      {
+        switch (i)
+        {
+          case 1:
+          (document.getElementById("speedbuttonone")).style.backgroundColor = "#2196F3";
+          break;
+          case 2:
+          (document.getElementById("speedbuttontwo")).style.backgroundColor = "#2196F3";
+          break;
+          case 3:
+          (document.getElementById("speedbuttonthree")).style.backgroundColor = "#2196F3";
+          break;
+          case 4:
+          (document.getElementById("speedbuttonfour")).style.backgroundColor = "#2196F3";
+          break;
+          case 5:
+          (document.getElementById("speedbuttonfive")).style.backgroundColor = "#2196F3";
+          break;
+        }
+      }
+      i++;
+    }
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/button?value="+buttonnumber, true);
+    xhr.send();
+    }
+
     function powerbutton()
     {
     if (onoff.checked != true)
@@ -186,6 +242,7 @@ const char index_html[] PROGMEM = R"rawliteral(
     xhr.open("GET", "/sliderMAX?value="+value, true);
     xhr.send();
     }
+
     function update()
     {
     document.getElementById("speedbuttonone").innerHTML = %SPEEDFIRSTBUTTON%+"ms";
@@ -199,8 +256,30 @@ const char index_html[] PROGMEM = R"rawliteral(
     }
     else
     {
-         document.getElementById("onoff").checked = false;
+    document.getElementById("onoff").checked = false;
     }
+    switch (%SELECTION%)
+    {
+      case 1:
+      (document.getElementById("speedbuttonone")).style.backgroundColor = "red";
+      break;
+      case 2:
+      (document.getElementById("speedbuttontwo")).style.backgroundColor = "red";
+      break;
+      case 3:
+      (document.getElementById("speedbuttonthree")).style.backgroundColor = "red";
+      break;
+      case 4:
+      (document.getElementById("speedbuttonfour")).style.backgroundColor = "red";
+      break;
+      case 5:
+      (document.getElementById("speedbuttonfive")).style.backgroundColor = "red";
+      break;
+      default:
+      console.log("error");
+      break;
+    }
+
     }
     function alert()
     {
@@ -236,6 +315,10 @@ String processor(const String &var)
     if (var == "STATUS")
   {
     return status;
+  }
+      if (var == "SELECTION")
+  {
+    return selection;
   }
     if (var == "MINVALUEANGLE")
   {
@@ -319,6 +402,20 @@ void setup()
     if (request->hasParam(PARAM_INPUT)) {
       inputMessage = request->getParam(PARAM_INPUT)->value();
       status = inputMessage;
+    }
+    else {
+      inputMessage = "No message sent";
+    }
+    Serial.println(inputMessage);
+    request->send(200, "text/plain", "OK");
+  });
+
+
+      server.on("/button", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    String inputMessage;
+    if (request->hasParam(PARAM_INPUT)) {
+      inputMessage = request->getParam(PARAM_INPUT)->value();
+      selection = inputMessage;
     }
     else {
       inputMessage = "No message sent";
