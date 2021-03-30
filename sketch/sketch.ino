@@ -15,6 +15,9 @@ String maxValueAngle="160";
 String minValueAngle="10";
 String status="1";
 
+
+const char* PARAM_INPUT = "value";
+
 AsyncWebServer server(80);
 
 const char index_html[] PROGMEM = R"rawliteral(
@@ -129,9 +132,9 @@ const char index_html[] PROGMEM = R"rawliteral(
         <div data-role="main" class="ui-content">
             <div data-role="rangeslider">
                 <label for="price-min">Winkel:</label>
-                <input type="range" name="angle-min" id="angle-min" value="%MINVALUEANGLE%" min="0" max="180">
+                <input type="range" onchange="setMin()" id="minSlider" name="angle-min" id="angle-min" value="%MINVALUEANGLE%" min="0" max="180">
                 <label for="angle-max">Winkel:</label>
-                <input type="range" name="angle-max" id="angle-max" value="%MAXVALUEANGLE%"  min="0" max="180">
+                <input type="range" onchange="setMax()" id="maxSlider" name="angle-max" id="angle-max" value="%MAXVALUEANGLE%"  min="0" max="180">
             </div>
         </div>
     </div>
@@ -155,7 +158,20 @@ const char index_html[] PROGMEM = R"rawliteral(
     <button id="setting" onclick="alert()"><img src="https://raw.githubusercontent.com/eleminer/AquariumStroemungspumpeWinkel/master/settingPicture.png"height="20%" width="20%"></button> 
     </div>
     <script>
-
+    function setMin()
+    {
+    var value = document.getElementById("minSlider").value;
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/sliderMIN?value="+value, true);
+    xhr.send();
+    }
+    function setMax()
+    {
+    var value = document.getElementById("maxSlider").value;
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/sliderMAX?value="+value, true);
+    xhr.send();
+    }
     function update()
     {
     document.getElementById("speedbuttonone").innerHTML = %SPEEDFIRSTBUTTON%+"ms";
@@ -240,6 +256,7 @@ String processor(const String &var)
 }
 
 void setup()
+
 {
   Serial.begin(115200);
   WiFi.begin(ssid, password);
@@ -253,6 +270,36 @@ void setup()
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send_P(200, "text/html", index_html, processor);
   });
+
+
+  server.on("/sliderMIN", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    String inputMessage;
+    if (request->hasParam(PARAM_INPUT)) {
+      inputMessage = request->getParam(PARAM_INPUT)->value();
+      minValueAngle = inputMessage;
+      Serial.println("MAX:"+maxValueAngle+"MIN:"+minValueAngle);
+    }
+    else {
+      inputMessage = "No message sent";
+    }
+    Serial.println(inputMessage);
+    request->send(200, "text/plain", "OK");
+  });
+
+  server.on("/sliderMAX", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    String inputMessage;
+    if (request->hasParam(PARAM_INPUT)) {
+      inputMessage = request->getParam(PARAM_INPUT)->value();
+      maxValueAngle = inputMessage;
+      Serial.println("MAX:"+maxValueAngle+"MIN:"+minValueAngle);
+    }
+    else {
+      inputMessage = "No message sent";
+    }
+    Serial.println(inputMessage);
+    request->send(200, "text/plain", "OK");
+  });
+
 
   server.begin();
 }
