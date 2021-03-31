@@ -12,9 +12,9 @@ String speedsecondButton="1";
 String speedthirdButton="2";
 String speedfourButton="3";
 String speedfiveButton="4";
-String maxValueAngle="160";
-String minValueAngle="10";
-String status="1";
+String maxValueAngle="135";
+String minValueAngle="45";
+String status="0";
 String selection="1";
 //values need to store in EEPROM
 
