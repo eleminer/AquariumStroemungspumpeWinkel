@@ -12,9 +12,21 @@ Bord URL's:
 
 Im Anschluss, unter Bordverwalter, beide Bords installieren.
 
-## 2. Installation von libraries
+## 2. Installation von Libraries
 
     https://github.com/me-no-dev/ESPAsyncWebServer
     https://github.com/me-no-dev/AsyncTCP
     https://github.com/me-no-dev/ESPAsyncTCP
+    https://github.com/zhouhan0126/WIFIMANAGER-ESP32
+    https://github.com/zhouhan0126/DNSServer---esp32
+    https://github.com/zhouhan0126/WebServer-esp32
+## 2.2 Info Hotspot Mode
 
+    https://randomnerdtutorials.com/wifimanager-with-esp8266-autoconnect-custom-parameter-and-manage-your-ssid-and-password/
+
+modifizierte Library: Wifi Manager, sodass diese mit Async funktioniert.
+
+    https://github.com/btomer/WiFiManager
+    
+    
+## 3 EEPROM flashen und Programm
