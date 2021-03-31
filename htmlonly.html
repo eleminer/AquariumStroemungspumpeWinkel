@@ -142,7 +142,7 @@
     {
       if(i==buttonnumber)
       {
-        switch (buttonnumber)
+        switch (i)
         {
           case 1:
           (document.getElementById("speedbuttonone")).style.backgroundColor = "red";
@@ -164,7 +164,7 @@
       }
       else
       {
-        switch (buttonnumber)
+        switch (i)
         {
           case 1:
           (document.getElementById("speedbuttonone")).style.backgroundColor = "#2196F3";
@@ -264,22 +264,37 @@
         {
             case "1":
             var temp=prompt("Millisekunden von 1:", "50");
+            document.getElementById("speedbuttonone").innerHTML = temp+"ms";
             break;
             case "2":
             var temp=prompt("Millisekunden von 2:", "50");
+            document.getElementById("speedbuttontwo").innerHTML = temp+"ms";
             break;
             case "3":
             var temp=prompt("Millisekunden von 3:", "50");
+            document.getElementById("speedbuttonthree").innerHTML = temp+"ms";
             break;
             case "4":
             var temp=prompt("Millisekunden von 4:", "50");
+            document.getElementById("speedbuttonfour").innerHTML = temp+"ms";
             break;
             case "5":
             var temp=prompt("Millisekunden von 5:", "50");
+            document.getElementById("speedbuttonfive").innerHTML = temp+"ms";
             break;
             default: 
             break;
         }
+
+    var one = document.getElementById("speedbuttonone").textContent;
+    var two = document.getElementById("speedbuttontwo").textContent;
+    var three = document.getElementById("speedbuttonthree").textContent;
+    //var four = document.getElementById("speedbuttonfour").textContent;
+    //var five = document.getElementById("speedbuttonfive").textContent;
+    //var xhr = new XMLHttpRequest();
+    //xhr.open("GET", "/buttonValues?value="+one+"/"+two+"/"+three+"/"+four+"/"+five, true);
+    //xhr.send();
+    console.log(one);
     }
 
     </script>

@@ -15,6 +15,7 @@ String maxValueAngle="160";
 String minValueAngle="10";
 String status="1";
 String selection="1";
+String valuesSpeedButtonsString="temp";
 
 
 const char* PARAM_INPUT = "value";
@@ -283,27 +284,44 @@ const char index_html[] PROGMEM = R"rawliteral(
     }
     function alert()
     {
+      console.log("here");
         var buttonnumber = prompt("Einstellungen Button (Nummer???)", "1");
+        console.log("test");
         switch (buttonnumber)
         {
             case "1":
             var temp=prompt("Millisekunden von 1:", "50");
+            document.getElementById("speedbuttonone").innerHTML = temp+"ms";
             break;
             case "2":
             var temp=prompt("Millisekunden von 2:", "50");
+            document.getElementById("speedbuttontwo").innerHTML = temp+"ms";
             break;
             case "3":
             var temp=prompt("Millisekunden von 3:", "50");
+            document.getElementById("speedbuttonthree").innerHTML = temp+"ms";
             break;
             case "4":
             var temp=prompt("Millisekunden von 4:", "50");
+            document.getElementById("speedbuttonfour").innerHTML = temp+"ms";
             break;
             case "5":
             var temp=prompt("Millisekunden von 5:", "50");
+            document.getElementById("speedbuttonfive").innerHTML = temp+"ms";
             break;
             default: 
             break;
         }
+
+    var one = document.getElementById("speedbuttonone").textContent;
+    var two = document.getElementById("speedbuttontwo").textContent;
+    var three = document.getElementById("speedbuttonthree").textContent;
+    var four = document.getElementById("speedbuttonfour").textContent;
+    var five = document.getElementById("speedbuttonfive").textContent;
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/buttonValues?value="+one+"/"+two+"/"+three+"/"+four+"/"+five, true);
+    xhr.send();
+    console.log("hello");
     }
 
     </script>
@@ -424,6 +442,19 @@ void setup()
     request->send(200, "text/plain", "OK");
   });
 
+
+      server.on("/buttonValues", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    String inputMessage;
+    if (request->hasParam(PARAM_INPUT)) {
+      inputMessage = request->getParam(PARAM_INPUT)->value();
+      valuesSpeedButtonsString = inputMessage;
+    }
+    else {
+      inputMessage = "No message sent";
+    }
+    Serial.println(inputMessage);
+    request->send(200, "text/plain", "OK");
+  });
 
   server.begin();
 }
