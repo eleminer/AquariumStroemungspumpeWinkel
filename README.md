@@ -20,3 +20,6 @@ Im Anschluss, unter Bordverwalter, beide Bords installieren.
     https://github.com/zhouhan0126/WIFIMANAGER-ESP32
     https://github.com/zhouhan0126/DNSServer---esp32
     https://github.com/zhouhan0126/WebServer-esp32
+## 2.2 Info Hotspot Mode
+
+    https://randomnerdtutorials.com/wifimanager-with-esp8266-autoconnect-custom-parameter-and-manage-your-ssid-and-password/
