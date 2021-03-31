@@ -17,4 +17,6 @@ Im Anschluss, unter Bordverwalter, beide Bords installieren.
     https://github.com/me-no-dev/ESPAsyncWebServer
     https://github.com/me-no-dev/AsyncTCP
     https://github.com/me-no-dev/ESPAsyncTCP
-
+    https://github.com/zhouhan0126/WIFIMANAGER-ESP32
+    https://github.com/zhouhan0126/DNSServer---esp32
+    https://github.com/zhouhan0126/WebServer-esp32
