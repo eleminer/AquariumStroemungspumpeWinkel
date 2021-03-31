@@ -25,7 +25,6 @@ void setup()
 EEPROM.begin(512);
 Serial.begin(9600);
 int i=0;
-int commacounter=0;
 while((char)EEPROM.read(i)!='E')
 {
   Serial.print((char)EEPROM.read(i));

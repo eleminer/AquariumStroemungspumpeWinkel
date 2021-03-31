@@ -2,6 +2,27 @@
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <EEPROM.h>
+int addr = 0;
+char eeprom[1000]="";
+char *pointer=eeprom;
+
+String getValue(String data, char separator, int index)
+{
+  int found = 0;
+  int strIndex[] = {0, -1};
+  int maxIndex = data.length()-1;
+
+  for(int i=0; i<=maxIndex && found<=index; i++){
+    if(data.charAt(i)==separator || i==maxIndex){
+        found++;
+        strIndex[0] = strIndex[1]+1;
+        strIndex[1] = (i == maxIndex) ? i+1 : i;
+    }
+  }
+
+  return found>index ? data.substring(strIndex[0], strIndex[1]) : "";
+}
+
 
 const char *ssid = "Develop";
 const char *password = "384783478";
@@ -418,7 +439,24 @@ void setup()
 
   //EEPROM
   //EEPROM
+  EEPROM.begin(512);
   Serial.begin(115200);
+
+  int i=0;
+  while((char)EEPROM.read(i)!='E')
+  {
+    Serial.print((char)EEPROM.read(i));
+    *pointer=(char)EEPROM.read(i);
+    pointer++;
+    i++;
+  }
+  Serial.println(eeprom);
+  speedfirstButton=getValue(eeprom,',',1);
+  speedsecondButton=getValue(eeprom,',',2);
+  speedthirdButton=getValue(eeprom,',',3);
+  speedfourButton=getValue(eeprom,',',4);
+  speedfiveButton=getValue(eeprom,',',5);
+
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED)
@@ -516,6 +554,12 @@ void setup()
           case 4: speedfourButton=String(recievedValue); break;
           case 5: speedfiveButton=String(recievedValue); break;
         }
+          String defaultSettings = String(","+String(speedfirstButton)+","+String(speedsecondButton)+","+String(speedthirdButton)+","+String(speedfourButton)+","+String(speedfiveButton)+"E");
+          for(int i=0;i<defaultSettings.length();i++)
+          {
+          EEPROM.write(0x0F+i, defaultSettings[i]);
+          }
+          EEPROM.commit();
       }
     }
   });
