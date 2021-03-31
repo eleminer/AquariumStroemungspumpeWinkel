@@ -1,11 +1,12 @@
 #include <ESP8266WiFi.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+#include <EEPROM.h>
 
 const char *ssid = "Develop";
 const char *password = "384783478";
 
-
+//values need to store in EEPROM
 String speedfirstButton="50";
 String speedsecondButton="1";
 String speedthirdButton="2";
@@ -15,7 +16,9 @@ String maxValueAngle="160";
 String minValueAngle="10";
 String status="1";
 String selection="1";
-String valuesSpeedButtonsString="temp";
+//values need to store in EEPROM
+
+
 
 const char* PARAM_INPUT = "value";
 const char* PARAM_INPUT_SECOND = "buttonN";
@@ -411,6 +414,10 @@ String processor(const String &var)
 void setup()
 
 {
+
+
+  //EEPROM
+  //EEPROM
   Serial.begin(115200);
   WiFi.begin(ssid, password);
 
