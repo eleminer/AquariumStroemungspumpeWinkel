@@ -29,4 +29,4 @@ modifizierte Library: Wifi Manager, sodass diese mit Async funktioniert.
     https://github.com/btomer/WiFiManager
     
     
-## 3 EEPROM flashen und Programm.
+## 3 EEPROM flashen und Programm
