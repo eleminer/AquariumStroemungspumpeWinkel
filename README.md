@@ -12,7 +12,7 @@ Bord URL's:
 
 Im Anschluss, unter Bordverwalter, beide Bords installieren.
 
-## 2. Installation von libraries
+## 2. Installation von Libraries
 
     https://github.com/me-no-dev/ESPAsyncWebServer
     https://github.com/me-no-dev/AsyncTCP
@@ -23,3 +23,9 @@ Im Anschluss, unter Bordverwalter, beide Bords installieren.
 ## 2.2 Info Hotspot Mode
 
     https://randomnerdtutorials.com/wifimanager-with-esp8266-autoconnect-custom-parameter-and-manage-your-ssid-and-password/
+
+modifizierte Library: Wifi Manager, sodass diese mit Async funktioniert.
+
+    https://github.com/btomer/WiFiManager
+    
+    
