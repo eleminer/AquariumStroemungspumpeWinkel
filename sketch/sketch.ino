@@ -2,6 +2,8 @@
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <EEPROM.h>
+#define WIFI_MANAGER_USE_ASYNC_WEB_SERVER
+#include <WiFiManager.h>
 int addr = 0;
 char eeprom[1000]="";
 char *pointer=eeprom;
@@ -457,13 +459,21 @@ void setup()
   speedfourButton=getValue(eeprom,',',4);
   speedfiveButton=getValue(eeprom,',',5);
 
-  WiFi.begin(ssid, password);
 
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    delay(1000);
-  }
-  Serial.println(WiFi.localIP());
+//here
+
+
+  //WiFi.begin(ssid, password);
+//
+  //while (WiFi.status() != WL_CONNECTED)
+  //{
+  //  delay(1000);
+  //}
+  //Serial.println(WiFi.localIP());
+WiFiManager wifiManager;
+wifiManager.autoConnect("Pumpe");
+
+  //here
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send_P(200, "text/html", index_html, processor);
