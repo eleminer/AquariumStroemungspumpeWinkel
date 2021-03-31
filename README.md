@@ -1,7 +1,7 @@
-# AquariumStroemungspumpe
+# Aquarium Stroemungspumpe Winkelsteuerung
 Dieses Repository beinhaltet Software zur Steuerung einer Strömungspumpe.
 
-## 1. Installieren von der Arduino IDE und Einbindung von ESP8266 udn ESP32.
+## 1. Installieren von der Arduino IDE und Einbindung von ESP8266 und ESP32.
 Arduino Installation: [Arduino Download](https://www.arduino.cc/en/software)
 
 Nach der Installation beide Bord URLS unter Voreinstellung eintragen.
@@ -22,7 +22,7 @@ Im Anschluss, unter Bordverwalter, beide Bords installieren.
     https://github.com/zhouhan0126/WebServer-esp32
 ## 2.2 Info zum Hotspot Mode
 [Infoseite](https://randomnerdtutorials.com/wifimanager-with-esp8266-autoconnect-custom-parameter-and-manage-your-ssid-and-password/)
-modifizierte Library: Wifi Manager, sodass diese mit Async funktioniert.
+Wichtig: modifizierte Library von Wifi Manager, sodass diese mit Async funktioniert.
 
     https://github.com/btomer/WiFiManager
     
