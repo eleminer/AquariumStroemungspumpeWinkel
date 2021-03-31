@@ -17,8 +17,12 @@ String status="1";
 String selection="1";
 String valuesSpeedButtonsString="temp";
 
-
 const char* PARAM_INPUT = "value";
+const char* PARAM_INPUT_SECOND = "buttonN";
+
+
+int recievedValue=0;
+int recievedButtonNumber=0;
 
 AsyncWebServer server(80);
 
@@ -291,35 +295,69 @@ const char index_html[] PROGMEM = R"rawliteral(
         {
             case "1":
             var temp=prompt("Millisekunden von 1:", "50");
+            var letters = /^[0-9]+$/;
+            if(temp.match(letters))
+            {
             document.getElementById("speedbuttonone").innerHTML = temp+"ms";
+            var invalue=temp;
+            }else
+            {
+                alert('invalid input');
+            }
             break;
             case "2":
             var temp=prompt("Millisekunden von 2:", "50");
+            var letters = /^[0-9]+$/;
+            if(temp.match(letters))
+            {
             document.getElementById("speedbuttontwo").innerHTML = temp+"ms";
+            var invalue=temp;
+            }else
+            {
+                alert('invalid input');
+            }
             break;
             case "3":
             var temp=prompt("Millisekunden von 3:", "50");
+            var letters = /^[0-9]+$/;
+            if(temp.match(letters))
+            {
             document.getElementById("speedbuttonthree").innerHTML = temp+"ms";
+            var invalue=temp;
+            }else
+            {
+                alert('invalid input');
+            }
             break;
             case "4":
             var temp=prompt("Millisekunden von 4:", "50");
+            var letters = /^[0-9]+$/;
+            if(temp.match(letters))
+            {
             document.getElementById("speedbuttonfour").innerHTML = temp+"ms";
+            var invalue=temp;
+            }else
+            {
+                alert('invalid input');
+            }
             break;
             case "5":
             var temp=prompt("Millisekunden von 5:", "50");
+            var letters = /^[0-9]+$/;
+            if(temp.match(letters))
+            {
             document.getElementById("speedbuttonfive").innerHTML = temp+"ms";
+            var invalue=temp;
+            }else
+            {
+                alert('invalid input');
+            }
             break;
             default: 
             break;
         }
-
-    var one = document.getElementById("speedbuttonone").textContent;
-    var two = document.getElementById("speedbuttontwo").textContent;
-    var three = document.getElementById("speedbuttonthree").textContent;
-    var four = document.getElementById("speedbuttonfour").textContent;
-    var five = document.getElementById("speedbuttonfive").textContent;
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", "/buttonValues?value="+one+"/"+two+"/"+three+"/"+four+"/"+five, true);
+    xhr.open("GET", "/buttonValues?value="+invalue+"&buttonN="+buttonnumber, true);
     xhr.send();
     console.log("hello");
     }
@@ -436,7 +474,7 @@ void setup()
       selection = inputMessage;
     }
     else {
-      inputMessage = "No message sent";
+      inputMessage = "No message sent1";
     }
     Serial.println(inputMessage);
     request->send(200, "text/plain", "OK");
@@ -445,15 +483,34 @@ void setup()
 
       server.on("/buttonValues", HTTP_GET, [] (AsyncWebServerRequest *request) {
     String inputMessage;
+    String inputMessageSecond;
     if (request->hasParam(PARAM_INPUT)) {
       inputMessage = request->getParam(PARAM_INPUT)->value();
-      valuesSpeedButtonsString = inputMessage;
+      Serial.println(inputMessage);
+      recievedValue= (inputMessage).toInt();
+      inputMessageSecond = request->getParam(PARAM_INPUT_SECOND)->value();
+      recievedButtonNumber= (inputMessageSecond).toInt();
+
     }
     else {
       inputMessage = "No message sent";
     }
-    Serial.println(inputMessage);
+    Serial.println("empfangen:"+String(recievedValue)+"number:"+String(recievedButtonNumber));
     request->send(200, "text/plain", "OK");
+    if(recievedButtonNumber>0 && recievedButtonNumber<=5)
+    {
+      if (recievedValue>0)
+      {
+        switch (recievedButtonNumber)
+        {
+          case 1: speedfirstButton=String(recievedValue); break;
+          case 2: speedsecondButton=String(recievedValue); break;
+          case 3: speedthirdButton=String(recievedValue); break;
+          case 4: speedfourButton=String(recievedValue); break;
+          case 5: speedfiveButton=String(recievedValue); break;
+        }
+      }
+    }
   });
 
   server.begin();
