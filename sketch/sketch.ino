@@ -4,6 +4,8 @@
 #include <EEPROM.h>
 #define WIFI_MANAGER_USE_ASYNC_WEB_SERVER
 #include <WiFiManager.h>
+#include <Servo.h>
+Servo myservo;
 int addr = 0;
 char eeprom[1000]="";
 char *pointer=eeprom;
@@ -42,11 +44,12 @@ String selection="1";
 //values need to store in EEPROM
 
 
-
+int positionServo=180;
+int direction=1;
 const char* PARAM_INPUT = "value";
 const char* PARAM_INPUT_SECOND = "buttonN";
 
-
+int servopin=15;
 int recievedValue=0;
 int recievedButtonNumber=0;
 
@@ -438,7 +441,8 @@ void setup()
 
 {
 
-
+  myservo.attach(servopin);
+  myservo.write(positionServo);
   //EEPROM
   //EEPROM
   EEPROM.begin(512);
@@ -579,4 +583,12 @@ wifiManager.autoConnect("Pumpe");
 
 void loop()
 {
+int pos;
+if(status=="1")
+{ 
+myservo.write(20);
+delay(1000);
+myservo.write(10);
+delay(1000);
+}
 }
