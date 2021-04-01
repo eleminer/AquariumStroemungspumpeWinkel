@@ -51,6 +51,8 @@ String maxValueAngle = "135";
 String minValueAngle = "45";
 String status = "0";
 String selection = "1";
+unsigned long currentTime=0;
+unsigned long timePoint = 0;
 
 AsyncWebServer server(80);
 
@@ -568,52 +570,67 @@ void setup()
 
 void loop()
 {
-  if (status == "1" && factorServo==1)
+  currentTime = millis();
+  int speed=100;
+  int temp=selection.toInt();
+  switch (temp)
   {
-    if (direction == 1)
-    {
-      positionServo++;
-    }
-    else
-    {
-      positionServo--;
-    }
-    myservo.write(positionServo);
-    delay(100);
-    if ((positionServo) >= (maxValueAngle.toInt()))
-    {
-      direction = 0;
-    }
-    if ((positionServo) <= (minValueAngle.toInt()))
-    {
-      direction = 1;
-    }
+    case 1: speed=speedfirstButton.toInt(); break;
+    case 2: speed=speedsecondButton.toInt(); break;
+    case 3: speed=speedthirdButton.toInt(); break;
+    case 4: speed=speedfourButton.toInt(); break;
+    case 5: speed=speedfiveButton.toInt(); break;
+    default:
+    break;
   }
-
-  if (status == "1" && factorServo==2)
+  if(currentTime-timePoint>speed)
   {
-    if (direction == 1)
-    {
-      positionServo++;
-    }
-    else
-    {
-      positionServo--;
-    }
-    myservo.write(positionServo);
-    delay(100);
-    int difference=maxValueAngle.toInt()-minValueAngle.toInt();
-    int midpoint=minValueAngle.toInt()+(difference/2);
-    
-    int maxNEW=(midpoint*2)+(difference);
-    int minNEW=(midpoint*2)-(difference);
-    if ((positionServo) >= (maxNEW))
-    {
-      direction = 0;
-    }
-    if ((positionServo) <= (minNEW))
-    {
-      direction = 1;
-    }
+      if (status == "1" && factorServo==1)
+      {
+        if (direction == 1)
+        {
+          positionServo++;
+        }
+        else
+        {
+          positionServo--;
+        }
+        myservo.write(positionServo);
+        if ((positionServo) >= (maxValueAngle.toInt()))
+        {
+          direction = 0;
+        }
+        if ((positionServo) <= (minValueAngle.toInt()))
+        {
+          direction = 1;
+        }
+      }
+
+      if (status == "1" && factorServo==2)
+      {
+        if (direction == 1)
+        {
+          positionServo++;
+        }
+        else
+        {
+          positionServo--;
+        }
+        myservo.write(positionServo);
+        int difference=maxValueAngle.toInt()-minValueAngle.toInt();
+        int midpoint=minValueAngle.toInt()+(difference/2);
+        
+        int maxNEW=(midpoint*2)+(difference);
+        int minNEW=(midpoint*2)-(difference);
+        if ((positionServo) >= (maxNEW))
+        {
+          direction = 0;
+        }
+        if ((positionServo) <= (minNEW))
+        {
+          direction = 1;
+        }
+      }
+      timePoint=millis();
   }
 }
