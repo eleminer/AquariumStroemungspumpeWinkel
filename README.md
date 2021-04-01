@@ -80,7 +80,7 @@ Diese Werte bleiben auch nach einem Stromausfall bzw. Neustart erhalten!
 
 ## 6. Verkabelung
 
-Servo Datenleitung an GPIO 15.
+Servo Datenleitung an GPIO 15. Am Wemos D1 wäre dies D8 zum Beispiel.
 
 Gemeinsames Ground beachten!
 
