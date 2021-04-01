@@ -150,8 +150,8 @@ const char index_html[] PROGMEM = R"rawliteral(
             border:none;
         }
         .valuesButtons {
-        margin-top: 0%;
-        font-size: 15px;
+            margin-top: 0%;
+            font-size: 15px;
         }
     </style>
     <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
@@ -438,9 +438,7 @@ String processor(const String &var)
 }
 
 void setup()
-
 {
-
   myservo.attach(servopin);
   myservo.write(positionServo * factorServo);
   EEPROM.begin(512);
