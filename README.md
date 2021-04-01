@@ -1,6 +1,8 @@
 # Aquarium Stroemungspumpe Winkelsteuerung
 Dieses Repository beinhaltet Software zur Steuerung einer Strömungspumpe.
 
+**Schnellstart mit vorkompilierten Files: siehe README (ziemlich am Ende)**
+
 ## 1. Installation von der Arduino IDE und Einbindung von ESP8266 und ESP32.
 Arduino Installation: [Arduino Download](https://www.arduino.cc/en/software)
 
@@ -96,3 +98,18 @@ Wenn dies nicht gewünscht ist, können die Zusatzpakete auch auf einem anderem 
 Wenn der Webspeicher im Gerät nicht gelöscht wird, hinterlegt der Browser gegebenfalls diese Daten um diese nicht immer wieder neu abfragen zu müssen.
 
 Darauf sollte man sich jedoch nicht verlassen!
+
+## 8. Schnellstart ESP8266
+
+1. Dieses Repository klonen (kopieren) und gegebenfalls extrahieren.
+2. ESPEasyFlasher-master öffnen.
+3. FlashESP8266.exe öffnen.
+4. EEPROM flashen.
+5. sketch flashen (Auswahl zwischen 180Grad oder 360Grad Servo).
+6. Mit WLAN Pumpe verbinden.
+7. 192.168.4.1 URL öffnen.
+8. WIFI einstellen.
+9. Kurz warten bis sich der ESP mit dem soeben eingegebenem WLAN verbindet.
+10. ESP neu starten
+11. Mit der ESP URL verbinden und den Servo einstellen.
+12. Kaffe holen, du hast es geschafft. :)
