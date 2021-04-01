@@ -9,7 +9,7 @@
 //nur diese Werte manuell ändern!
 const char *ssid = "Develop";
 const char *password = "384783478";
-int factorServo = 1; //2, wenn 360°Servo.
+int factorServo = 2; //2, wenn 360°Servo. 1, wenn 180°Servo
 int servopin = 15;
 //nur diese Werte manuell ändern!
 
@@ -440,7 +440,7 @@ String processor(const String &var)
 void setup()
 {
   myservo.attach(servopin);
-  myservo.write(positionServo * factorServo);
+  myservo.write(positionServo*factorServo);
   EEPROM.begin(512);
   Serial.begin(115200);
   int i = 0;
@@ -568,7 +568,7 @@ void setup()
 
 void loop()
 {
-  if (status == "1")
+  if (status == "1" && factorServo==1)
   {
     if (direction == 1)
     {
@@ -580,11 +580,38 @@ void loop()
     }
     myservo.write(positionServo);
     delay(100);
-    if ((positionServo * factorServo) >= (maxValueAngle.toInt() * factorServo))
+    if ((positionServo) >= (maxValueAngle.toInt()))
     {
       direction = 0;
     }
-    if ((positionServo * factorServo) <= (minValueAngle.toInt() * factorServo))
+    if ((positionServo) <= (minValueAngle.toInt()))
+    {
+      direction = 1;
+    }
+  }
+
+  if (status == "1" && factorServo==2)
+  {
+    if (direction == 1)
+    {
+      positionServo++;
+    }
+    else
+    {
+      positionServo--;
+    }
+    myservo.write(positionServo);
+    delay(100);
+    int difference=maxValueAngle.toInt()-minValueAngle.toInt();
+    int midpoint=minValueAngle.toInt()+(difference/2);
+    
+    int maxNEW=(midpoint*2)+(difference);
+    int minNEW=(midpoint*2)-(difference);
+    if ((positionServo) >= (maxNEW))
+    {
+      direction = 0;
+    }
+    if ((positionServo) <= (minNEW))
     {
       direction = 1;
     }
