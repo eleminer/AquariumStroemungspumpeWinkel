@@ -49,7 +49,7 @@ GPIO Pin:
     int factorServo = 1; //2, wenn 360°Servo.
 
 
-## WLAN einstellen
+## 4. WLAN einstellen
 
 Wenn kein bekanntes WLAN beim Start verfügbar ist, baut der ESP ein eigenes WLAN mit der SSID "**Pumpe**" auf. Unter der IP: **192.168.4.1**, kann nun das WLAN hinterlegt werden. Danach startet der ESP neu und versucht sich zu verbinden. Wenn die funktioniert hat, verbindet sich der ESP mit dem Netzwerk und baut kein eigenes Netzwerk mehr auf.
 
@@ -64,7 +64,7 @@ So sieht die Webseite zum Einstellen des WLAN aus:
 Damit nun der Webservice verfügbar ist, **muss** der ESP jedoch **nach der erfolgreichen Verbindung nochmal neu gestartet werden**.
 Danach sollte der Webservice unter der IP vom ESP und dem Port 80 im Netzwerk erreichbar sein.
 
-## Grafisches Interface
+## 5. Grafisches Interface
 
 So sieht die "Steuerungswebseite" aus:
 
@@ -78,8 +78,13 @@ Die Zeit pro Winkel pro Knopf, in Millisekunden, können über das Einstellungsm
 Werte zwischen **1ms und 9999999ms** werden vom Programm angenommen und abgespeichert.
 Diese Werte bleiben auch nach einem Stromausfall bzw. Neustart erhalten!
 
+## 6. Verkabelung
 
-## Besonderheit
+Servo Datenleitung an GPIO 15.
+
+Gemeinsames Ground beachten!
+
+## 7. Besonderheit
 
 Da die Webseite auf einem Mikrocontroller gehostet wird, werden Zusatz Pakete im Form von Javascript oder Images von externer Quelle geladen.
 
