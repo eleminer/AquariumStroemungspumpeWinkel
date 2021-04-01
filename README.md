@@ -1,7 +1,7 @@
 # Aquarium Stroemungspumpe Winkelsteuerung
 Dieses Repository beinhaltet Software zur Steuerung einer Strömungspumpe.
 
-## 1. Installieren von der Arduino IDE und Einbindung von ESP8266 und ESP32.
+## 1. Installation von der Arduino IDE und Einbindung von ESP8266 und ESP32.
 Arduino Installation: [Arduino Download](https://www.arduino.cc/en/software)
 
 Nach der Installation beide Bord URLS unter Voreinstellung eintragen.
@@ -73,7 +73,7 @@ Android Smartphone         | Windows PC
 <img src="readmePictures/ScreenshotAndroid.jpeg" width="300">  |  <img src="readmePictures/ScreenshotWindows.png" width="600">
 
 
-Die Zeit pro Winkel, in Millisekunden, können über das Einstellungsmenü (mittlerer Knopf (Zahnrad)) eingestellt werden.
+Die Zeit pro Winkel pro Knopf, in Millisekunden, können über das Einstellungsmenü (mittlerer Knopf (Zahnrad)) eingestellt werden.
 
 Werte zwischen **1ms und 9999999ms** werden vom Programm angenommen und abgespeichert.
 Diese Werte bleiben auch nach einem Stromausfall bzw. Neustart erhalten!
@@ -82,8 +82,12 @@ Diese Werte bleiben auch nach einem Stromausfall bzw. Neustart erhalten!
 ## Besonderheit
 
 Da die Webseite auf einem Mikrocontroller gehostet wird, werden Zusatz Pakete im Form von Javascript oder Images von externer Quelle geladen.
-Das Wlan in welchem sich der ESP und das Gerät zum Steuerun (Smartphone oder Laptop etc.) befindet muss daher zwingend mit dem Internet verbunden sein.
+
+Das Wlan in welchem sich der ESP und das Gerät zur Steuerung (Smartphone oder Laptop etc.) befindet muss daher zwingend mit dem Internet verbunden sein.
 
 Wenn dies nicht gewünscht ist, können die Zusatzpakete auch auf einem anderem Gerät im Netzwerk gehostet werden. (NAS System, Raspberry etc.)
 
+
 Wenn der Webspeicher im Gerät nicht gelöscht wird, hinterlegt der Browser gegebenfalls diese Daten um diese nicht immer wieder neu abfragen zu müssen.
+
+Darauf sollte man sich jedoch nicht verlassen!
