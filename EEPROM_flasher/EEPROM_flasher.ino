@@ -4,13 +4,12 @@ void setup()
 {
   EEPROM.begin(512);
   String defaultSettings = ",10,20,30,40,50E";
-  for(int i=0;i<defaultSettings.length();i++)
+  for (int i = 0; i < defaultSettings.length(); i++)
   {
-    EEPROM.write(0x0F+i, defaultSettings[i]);
+    EEPROM.write(0x0F + i, defaultSettings[i]);
   }
   EEPROM.commit();
 }
- 
 void loop()
-{   
+{
 }
