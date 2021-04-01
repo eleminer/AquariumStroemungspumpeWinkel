@@ -38,7 +38,7 @@ Beim Hochladen des Programmes ist zu beachten, dass der EEPROM **zuerst** sepera
 
 ## 3.2. Info zum Hauptprogramm
 
-Im Hauptprogramm kann der GPIO Pin für den Servo hinterlegt werden und ob es sich um einen 180° Servo handelt oder einem 360° Servo.
+Im Hauptprogramm kann der GPIO Pin für den Servo hinterlegt werden und ob es sich um einen 180° Servo handelt oder einen 360° Servo.
 
 GPIO Pin:
     
