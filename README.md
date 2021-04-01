@@ -20,11 +20,70 @@ Im Anschluss, unter Bordverwalter, beide Bords installieren.
     https://github.com/zhouhan0126/WIFIMANAGER-ESP32
     https://github.com/zhouhan0126/DNSServer---esp32
     https://github.com/zhouhan0126/WebServer-esp32
-## 2.2 Info zum Hotspot Mode
+    
+## 2.2. Info zum Hotspot Mode
 [Infoseite](https://randomnerdtutorials.com/wifimanager-with-esp8266-autoconnect-custom-parameter-and-manage-your-ssid-and-password/)
 Wichtig: modifizierte Library von Wifi Manager, sodass diese mit Async funktioniert.
 
     https://github.com/btomer/WiFiManager
     
     
-## 3 EEPROM flashen und Programm
+## 3. Programm hochladen auf einen ESP8266/ESP32
+
+Beim Hochladen des Programmes ist zu beachten, dass der EEPROM **zuerst** seperat geflasht wird!
+
+1. Dafür wird das Programm im Ordner EEPROM_flasher auf den ESP geladen.
+
+2. Danach kann das Hautprogramm auf die gleiche Art und Weise hochgeladen werden. (sketch)
+
+## 3.2. Info zum Hauptprogramm
+
+Im Hauptprogramm kann der GPIO Pin für den Servo hinterlegt werden und ob es sich um einen 180° Servo handelt oder einem 360° Servo.
+
+GPIO Pin:
+    
+    int servopin = 15;
+       
+ Faktor 180/360°
+ 
+    int factorServo = 1; //2, wenn 360°Servo.
+
+
+## WLAN einstellen
+
+Wenn kein bekanntes WLAN beim Start verfügbar ist, baut der ESP ein eigenes WLAN mit der SSID "**Pumpe**" auf. Unter der IP: **192.168.4.1**, kann nun das WLAN hinterlegt werden. Danach startet der ESP neu und versucht sich zu verbinden. Wenn die funktioniert hat, verbindet sich der ESP mit dem Netzwerk und baut kein eigenes Netzwerk mehr auf.
+
+**Das WLAN Passwort sollte nicht länger als 40Zeichen sein!**
+**Die SSID sollte nicht länger sein als 30 Zeichen!**
+
+So sieht die Webseite zum Einstellen des WLAN aus:
+
+<img src="readmePictures/ScreenshotAndroidHotspot.jpeg" width="200">
+
+
+Damit nun der Webservice verfügbar ist, **muss** der ESP jedoch **nach der erfolgreichen Verbindung nochmal neu gestartet werden**.
+Danach sollte der Webservice unter der IP vom ESP und dem Port 80 im Netzwerk erreichbar sein.
+
+## Grafisches Interface
+
+So sieht die "Steuerungswebseite" aus:
+
+Android Smartphone         | Windows PC 
+:-------------------------:|:-------------------------:
+<img src="readmePictures/ScreenshotAndroid.jpeg" width="300">  |  <img src="readmePictures/ScreenshotWindows.png" width="600">
+
+
+Die Zeit pro Winkel, in Millisekunden, können über das Einstellungsmenü (mittlerer Knopf (Zahnrad)) eingestellt werden.
+
+Werte zwischen **1ms und 9999999ms** werden vom Programm angenommen und abgespeichert.
+Diese Werte bleiben auch nach einem Stromausfall bzw. Neustart erhalten!
+
+
+## Besonderheit
+
+Da die Webseite auf einem Mikrocontroller gehostet wird, werden Zusatz Pakete im Form von Javascript oder Images von externer Quelle geladen.
+Das Wlan in welchem sich der ESP und das Gerät zum Steuerun (Smartphone oder Laptop etc.) befindet muss daher zwingend mit dem Internet verbunden sein.
+
+Wenn dies nicht gewünscht ist, können die Zusatzpakete auch auf einem anderem Gerät im Netzwerk gehostet werden. (NAS System, Raspberry etc.)
+
+Wenn der Webspeicher im Gerät nicht gelöscht wird, hinterlegt der Browser gegebenfalls diese Daten um diese nicht immer wieder neu abfragen zu müssen.
