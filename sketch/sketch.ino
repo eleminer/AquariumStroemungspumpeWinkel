@@ -583,7 +583,7 @@ void loop()
     default:
     break;
   }
-  if(currentTime-timePoint>speed)
+  if((unsigned long)currentTime-timePoint>speed)
   {
       if (status == "1" && factorServo==1)
       {
