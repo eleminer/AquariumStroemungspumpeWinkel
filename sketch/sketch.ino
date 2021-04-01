@@ -5,53 +5,52 @@
 #define WIFI_MANAGER_USE_ASYNC_WEB_SERVER
 #include <WiFiManager.h>
 #include <Servo.h>
-Servo myservo;
-int addr = 0;
-char eeprom[1000]="";
-char *pointer=eeprom;
+
+//nur diese Werte manuell ändern!
+const char *ssid = "Develop";
+const char *password = "384783478";
+int factorServo = 1; //2, wenn 360°Servo.
+int servopin = 15;
+//nur diese Werte manuell ändern!
 
 String getValue(String data, char separator, int index)
 {
   int found = 0;
   int strIndex[] = {0, -1};
-  int maxIndex = data.length()-1;
+  int maxIndex = data.length() - 1;
 
-  for(int i=0; i<=maxIndex && found<=index; i++){
-    if(data.charAt(i)==separator || i==maxIndex){
-        found++;
-        strIndex[0] = strIndex[1]+1;
-        strIndex[1] = (i == maxIndex) ? i+1 : i;
+  for (int i = 0; i <= maxIndex && found <= index; i++)
+  {
+    if (data.charAt(i) == separator || i == maxIndex)
+    {
+      found++;
+      strIndex[0] = strIndex[1] + 1;
+      strIndex[1] = (i == maxIndex) ? i + 1 : i;
     }
   }
 
-  return found>index ? data.substring(strIndex[0], strIndex[1]) : "";
+  return found > index ? data.substring(strIndex[0], strIndex[1]) : "";
 }
 
-
-const char *ssid = "Develop";
-const char *password = "384783478";
-
-//values need to store in EEPROM
-String speedfirstButton="50";
-String speedsecondButton="1";
-String speedthirdButton="2";
-String speedfourButton="3";
-String speedfiveButton="4";
-String maxValueAngle="135";
-String minValueAngle="45";
-String status="0";
-String selection="1";
-//values need to store in EEPROM
-
-
-int positionServo=180;
-int direction=1;
-const char* PARAM_INPUT = "value";
-const char* PARAM_INPUT_SECOND = "buttonN";
-
-int servopin=15;
-int recievedValue=0;
-int recievedButtonNumber=0;
+Servo myservo;
+int addr = 0;
+char eeprom[1000] = "";
+char *pointer = eeprom;
+int positionServo = 90;
+int direction = 1;
+const char *PARAM_INPUT = "value";
+const char *PARAM_INPUT_SECOND = "buttonN";
+int recievedValue = 0;
+int recievedButtonNumber = 0;
+String speedfirstButton = "50";
+String speedsecondButton = "1";
+String speedthirdButton = "2";
+String speedfourButton = "3";
+String speedfiveButton = "4";
+String maxValueAngle = "135";
+String minValueAngle = "45";
+String status = "0";
+String selection = "1";
 
 AsyncWebServer server(80);
 
@@ -193,6 +192,7 @@ const char index_html[] PROGMEM = R"rawliteral(
     <button id="setting" onclick="alert()"><img src="https://raw.githubusercontent.com/eleminer/AquariumStroemungspumpeWinkel/master/settingPicture.png"height="20%" width="20%"></button> 
     </div>
     <script>
+
     function buttonchange(buttonnumber)
     {
     var i=1;
@@ -262,6 +262,7 @@ const char index_html[] PROGMEM = R"rawliteral(
     xhr.open("GET", "/power?value="+value, true);
     xhr.send();
     }
+
     function setMin()
     {
     var value = document.getElementById("minSlider").value;
@@ -269,6 +270,7 @@ const char index_html[] PROGMEM = R"rawliteral(
     xhr.open("GET", "/sliderMIN?value="+value, true);
     xhr.send();
     }
+
     function setMax()
     {
     var value = document.getElementById("maxSlider").value;
@@ -315,11 +317,10 @@ const char index_html[] PROGMEM = R"rawliteral(
     }
 
     }
+
     function alert()
     {
-      console.log("here");
         var buttonnumber = prompt("Einstellungen Button (Nummer???)", "1");
-        console.log("test");
         switch (buttonnumber)
         {
             case "1":
@@ -388,7 +389,6 @@ const char index_html[] PROGMEM = R"rawliteral(
     var xhr = new XMLHttpRequest();
     xhr.open("GET", "/buttonValues?value="+invalue+"&buttonN="+buttonnumber, true);
     xhr.send();
-    console.log("hello");
     }
 
     </script>
@@ -397,19 +397,19 @@ const char index_html[] PROGMEM = R"rawliteral(
 )rawliteral";
 String processor(const String &var)
 {
-    if (var == "STATUS")
+  if (var == "STATUS")
   {
     return status;
   }
-      if (var == "SELECTION")
+  if (var == "SELECTION")
   {
     return selection;
   }
-    if (var == "MINVALUEANGLE")
+  if (var == "MINVALUEANGLE")
   {
     return minValueAngle;
   }
-    if (var == "MAXVALUEANGLE")
+  if (var == "MAXVALUEANGLE")
   {
     return maxValueAngle;
   }
@@ -433,7 +433,7 @@ String processor(const String &var)
   {
     return speedfiveButton;
   }
-  
+
   return String();
 }
 
@@ -442,153 +442,153 @@ void setup()
 {
 
   myservo.attach(servopin);
-  myservo.write(positionServo);
-  //EEPROM
-  //EEPROM
+  myservo.write(positionServo * factorServo);
   EEPROM.begin(512);
   Serial.begin(115200);
-
-  int i=0;
-  while((char)EEPROM.read(i)!='E')
+  int i = 0;
+  while ((char)EEPROM.read(i) != 'E')
   {
-    Serial.print((char)EEPROM.read(i));
-    *pointer=(char)EEPROM.read(i);
+    *pointer = (char)EEPROM.read(i);
     pointer++;
     i++;
   }
-  Serial.println(eeprom);
-  speedfirstButton=getValue(eeprom,',',1);
-  speedsecondButton=getValue(eeprom,',',2);
-  speedthirdButton=getValue(eeprom,',',3);
-  speedfourButton=getValue(eeprom,',',4);
-  speedfiveButton=getValue(eeprom,',',5);
-
-
-//here
-
-
-  //WiFi.begin(ssid, password);
-//
-  //while (WiFi.status() != WL_CONNECTED)
-  //{
-  //  delay(1000);
-  //}
-  //Serial.println(WiFi.localIP());
-WiFiManager wifiManager;
-wifiManager.autoConnect("Pumpe");
-
-  //here
-
+  speedfirstButton = getValue(eeprom, ',', 1);
+  speedsecondButton = getValue(eeprom, ',', 2);
+  speedthirdButton = getValue(eeprom, ',', 3);
+  speedfourButton = getValue(eeprom, ',', 4);
+  speedfiveButton = getValue(eeprom, ',', 5);
+  WiFiManager wifiManager;
+  wifiManager.autoConnect("Pumpe");
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send_P(200, "text/html", index_html, processor);
   });
 
-
-  server.on("/sliderMIN", HTTP_GET, [] (AsyncWebServerRequest *request) {
+  server.on("/sliderMIN", HTTP_GET, [](AsyncWebServerRequest *request) {
     String inputMessage;
-    if (request->hasParam(PARAM_INPUT)) {
+    if (request->hasParam(PARAM_INPUT))
+    {
       inputMessage = request->getParam(PARAM_INPUT)->value();
       minValueAngle = inputMessage;
-      Serial.println("MAX:"+maxValueAngle+"MIN:"+minValueAngle);
     }
-    else {
+    else
+    {
       inputMessage = "No message sent";
     }
-    Serial.println(inputMessage);
     request->send(200, "text/plain", "OK");
   });
 
-  server.on("/sliderMAX", HTTP_GET, [] (AsyncWebServerRequest *request) {
+  server.on("/sliderMAX", HTTP_GET, [](AsyncWebServerRequest *request) {
     String inputMessage;
-    if (request->hasParam(PARAM_INPUT)) {
+    if (request->hasParam(PARAM_INPUT))
+    {
       inputMessage = request->getParam(PARAM_INPUT)->value();
       maxValueAngle = inputMessage;
-      Serial.println("MAX:"+maxValueAngle+"MIN:"+minValueAngle);
     }
-    else {
+    else
+    {
       inputMessage = "No message sent";
     }
-    Serial.println(inputMessage);
     request->send(200, "text/plain", "OK");
   });
 
-    server.on("/power", HTTP_GET, [] (AsyncWebServerRequest *request) {
+  server.on("/power", HTTP_GET, [](AsyncWebServerRequest *request) {
     String inputMessage;
-    if (request->hasParam(PARAM_INPUT)) {
+    if (request->hasParam(PARAM_INPUT))
+    {
       inputMessage = request->getParam(PARAM_INPUT)->value();
       status = inputMessage;
     }
-    else {
+    else
+    {
       inputMessage = "No message sent";
     }
-    Serial.println(inputMessage);
     request->send(200, "text/plain", "OK");
   });
 
-
-      server.on("/button", HTTP_GET, [] (AsyncWebServerRequest *request) {
+  server.on("/button", HTTP_GET, [](AsyncWebServerRequest *request) {
     String inputMessage;
-    if (request->hasParam(PARAM_INPUT)) {
+    if (request->hasParam(PARAM_INPUT))
+    {
       inputMessage = request->getParam(PARAM_INPUT)->value();
       selection = inputMessage;
     }
-    else {
+    else
+    {
       inputMessage = "No message sent1";
     }
-    Serial.println(inputMessage);
     request->send(200, "text/plain", "OK");
   });
 
-
-      server.on("/buttonValues", HTTP_GET, [] (AsyncWebServerRequest *request) {
+  server.on("/buttonValues", HTTP_GET, [](AsyncWebServerRequest *request) {
     String inputMessage;
     String inputMessageSecond;
-    if (request->hasParam(PARAM_INPUT)) {
+    if (request->hasParam(PARAM_INPUT))
+    {
       inputMessage = request->getParam(PARAM_INPUT)->value();
-      Serial.println(inputMessage);
-      recievedValue= (inputMessage).toInt();
+      recievedValue = (inputMessage).toInt();
       inputMessageSecond = request->getParam(PARAM_INPUT_SECOND)->value();
-      recievedButtonNumber= (inputMessageSecond).toInt();
-
+      recievedButtonNumber = (inputMessageSecond).toInt();
     }
-    else {
+    else
+    {
       inputMessage = "No message sent";
     }
-    Serial.println("empfangen:"+String(recievedValue)+"number:"+String(recievedButtonNumber));
     request->send(200, "text/plain", "OK");
-    if(recievedButtonNumber>0 && recievedButtonNumber<=5)
+    if (recievedButtonNumber > 0 && recievedButtonNumber <= 5)
     {
-      if (recievedValue>0)
+      if (recievedValue > 0)
       {
         switch (recievedButtonNumber)
         {
-          case 1: speedfirstButton=String(recievedValue); break;
-          case 2: speedsecondButton=String(recievedValue); break;
-          case 3: speedthirdButton=String(recievedValue); break;
-          case 4: speedfourButton=String(recievedValue); break;
-          case 5: speedfiveButton=String(recievedValue); break;
+        case 1:
+          speedfirstButton = String(recievedValue);
+          break;
+        case 2:
+          speedsecondButton = String(recievedValue);
+          break;
+        case 3:
+          speedthirdButton = String(recievedValue);
+          break;
+        case 4:
+          speedfourButton = String(recievedValue);
+          break;
+        case 5:
+          speedfiveButton = String(recievedValue);
+          break;
         }
-          String defaultSettings = String(","+String(speedfirstButton)+","+String(speedsecondButton)+","+String(speedthirdButton)+","+String(speedfourButton)+","+String(speedfiveButton)+"E");
-          for(int i=0;i<defaultSettings.length();i++)
-          {
-          EEPROM.write(0x0F+i, defaultSettings[i]);
-          }
-          EEPROM.commit();
+        String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "E");
+        for (int i = 0; i < defaultSettings.length(); i++)
+        {
+          EEPROM.write(0x0F + i, defaultSettings[i]);
+        }
+        EEPROM.commit();
       }
     }
   });
-
   server.begin();
 }
 
 void loop()
 {
-int pos;
-if(status=="1")
-{ 
-myservo.write(20);
-delay(1000);
-myservo.write(10);
-delay(1000);
-}
+  if (status == "1")
+  {
+    if (direction == 1)
+    {
+      positionServo++;
+    }
+    else
+    {
+      positionServo--;
+    }
+    myservo.write(positionServo);
+    delay(100);
+    if ((positionServo * factorServo) >= (maxValueAngle.toInt() * factorServo))
+    {
+      direction = 0;
+    }
+    if ((positionServo * factorServo) <= (minValueAngle.toInt() * factorServo))
+    {
+      direction = 1;
+    }
+  }
 }
