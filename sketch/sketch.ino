@@ -9,7 +9,7 @@
 //nur diese Werte manuell ändern!
 const char *ssid = "Develop";
 const char *password = "384783478";
-int factorServo = 1; //2, wenn 360°Servo. 1, wenn 180°Servo
+int factorServo = 2; //2, wenn 360°Servo. 1, wenn 180°Servo
 int servopin = 15;
 //nur diese Werte manuell ändern!
 
