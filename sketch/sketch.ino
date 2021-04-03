@@ -51,7 +51,7 @@ String maxValueAngle = "135";
 String minValueAngle = "45";
 String status = "0";
 String selection = "1";
-unsigned long currentTime=0;
+unsigned long currentTime = 0;
 unsigned long timePoint = 0;
 
 AsyncWebServer server(80);
@@ -442,7 +442,7 @@ String processor(const String &var)
 void setup()
 {
   myservo.attach(servopin);
-  myservo.write(positionServo*factorServo);
+  myservo.write(positionServo * factorServo);
   EEPROM.begin(512);
   Serial.begin(115200);
   int i = 0;
@@ -457,6 +457,9 @@ void setup()
   speedthirdButton = getValue(eeprom, ',', 3);
   speedfourButton = getValue(eeprom, ',', 4);
   speedfiveButton = getValue(eeprom, ',', 5);
+  status = getValue(eeprom, ',', 6);
+  minValueAngle = getValue(eeprom, ',', 7);
+  maxValueAngle = getValue(eeprom, ',', 8);
   WiFiManager wifiManager;
   wifiManager.autoConnect("Pumpe");
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -556,7 +559,7 @@ void setup()
           speedfiveButton = String(recievedValue);
           break;
         }
-        String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "E");
+        String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "E");
         for (int i = 0; i < defaultSettings.length(); i++)
         {
           EEPROM.write(0x0F + i, defaultSettings[i]);
@@ -571,66 +574,76 @@ void setup()
 void loop()
 {
   currentTime = millis();
-  int speed=100;
-  int temp=selection.toInt();
+  int speed = 100;
+  int temp = selection.toInt();
   switch (temp)
   {
-    case 1: speed=speedfirstButton.toInt(); break;
-    case 2: speed=speedsecondButton.toInt(); break;
-    case 3: speed=speedthirdButton.toInt(); break;
-    case 4: speed=speedfourButton.toInt(); break;
-    case 5: speed=speedfiveButton.toInt(); break;
-    default:
+  case 1:
+    speed = speedfirstButton.toInt();
+    break;
+  case 2:
+    speed = speedsecondButton.toInt();
+    break;
+  case 3:
+    speed = speedthirdButton.toInt();
+    break;
+  case 4:
+    speed = speedfourButton.toInt();
+    break;
+  case 5:
+    speed = speedfiveButton.toInt();
+    break;
+  default:
     break;
   }
-  if((unsigned long)currentTime-timePoint>speed)
+  if ((unsigned long)currentTime - timePoint > speed)
   {
-      if (status == "1" && factorServo==1)
+    if (status == "1" && factorServo == 1)
+    {
+      if (direction == 1)
       {
-        if (direction == 1)
-        {
-          positionServo++;
-        }
-        else
-        {
-          positionServo--;
-        }
-        myservo.write(positionServo);
-        if ((positionServo) >= (maxValueAngle.toInt()))
-        {
-          direction = 0;
-        }
-        if ((positionServo) <= (minValueAngle.toInt()))
-        {
-          direction = 1;
-        }
+        positionServo++;
       }
+      else
+      {
+        positionServo--;
+      }
+      myservo.write(positionServo);
+      if ((positionServo) >= (maxValueAngle.toInt()))
+      {
+        direction = 0;
+      }
+      if ((positionServo) <= (minValueAngle.toInt()))
+      {
+        direction = 1;
+      }
+    }
 
-      if (status == "1" && factorServo==2)
+    if (status == "1" && factorServo == 2)
+    {
+      if (direction == 1)
       {
-        if (direction == 1)
-        {
-          positionServo++;
-        }
-        else
-        {
-          positionServo--;
-        }
-        myservo.write(positionServo);
-        int difference=maxValueAngle.toInt()-minValueAngle.toInt();
-        int midpoint=minValueAngle.toInt()+(difference/2);
-        
-        int maxNEW=(midpoint*2)+(difference);
-        int minNEW=(midpoint*2)-(difference);
-        if ((positionServo) >= (maxNEW))
-        {
-          direction = 0;
-        }
-        if ((positionServo) <= (minNEW))
-        {
-          direction = 1;
-        }
+        positionServo++;
       }
-      timePoint=millis();
+      else
+      {
+        positionServo--;
+      }
+      myservo.write(positionServo);
+      int difference = maxValueAngle.toInt() - minValueAngle.toInt();
+      int midpoint = minValueAngle.toInt() + (difference / 2);
+
+      int maxNEW = (midpoint * 2) + (difference);
+      int minNEW = (midpoint * 2) - (difference);
+      if ((positionServo) >= (maxNEW))
+      {
+        direction = 0;
+      }
+      if ((positionServo) <= (minNEW))
+      {
+        direction = 1;
+      }
+    }
+    timePoint = millis();
   }
 }
