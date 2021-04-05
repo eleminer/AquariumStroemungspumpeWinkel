@@ -500,6 +500,12 @@ void setup()
     {
       inputMessage = request->getParam(PARAM_INPUT)->value();
       status = inputMessage;
+      String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "E");
+      for (int i = 0; i < defaultSettings.length(); i++)
+      {
+      EEPROM.write(0x0F + i, defaultSettings[i]);
+      }
+      EEPROM.commit();
     }
     else
     {
