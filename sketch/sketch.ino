@@ -9,7 +9,7 @@
 //nur diese Werte manuell ändern!
 const char *ssid = "Develop";
 const char *password = "384783478";
-int factorServo = 2; //2, wenn 360°Servo. 1, wenn 180°Servo
+int factorServo = 1; //2, wenn 360°Servo. 1, wenn 180°Servo
 int servopin = 15;
 //nur diese Werte manuell ändern!
 
@@ -327,7 +327,7 @@ const char index_html[] PROGMEM = R"rawliteral(
         {
             case "1":
             var temp=prompt("Millisekunden von 1:", "50");
-            var letters = /^[1-9]+$/;
+            var letters = /^[0-9]+$/;
             if(temp.match(letters))
             {
             document.getElementById("speedbuttonone").innerHTML = temp+"ms";
@@ -339,7 +339,7 @@ const char index_html[] PROGMEM = R"rawliteral(
             break;
             case "2":
             var temp=prompt("Millisekunden von 2:", "50");
-            var letters = /^[1-9]+$/;
+            var letters = /^[0-9]+$/;
             if(temp.match(letters))
             {
             document.getElementById("speedbuttontwo").innerHTML = temp+"ms";
@@ -351,7 +351,7 @@ const char index_html[] PROGMEM = R"rawliteral(
             break;
             case "3":
             var temp=prompt("Millisekunden von 3:", "50");
-            var letters = /^[1-9]+$/;
+            var letters = /^[0-9]+$/;
             if(temp.match(letters))
             {
             document.getElementById("speedbuttonthree").innerHTML = temp+"ms";
@@ -363,7 +363,7 @@ const char index_html[] PROGMEM = R"rawliteral(
             break;
             case "4":
             var temp=prompt("Millisekunden von 4:", "50");
-            var letters = /^[1-9]+$/;
+            var letters = /^[0-9]+$/;
             if(temp.match(letters))
             {
             document.getElementById("speedbuttonfour").innerHTML = temp+"ms";
@@ -375,7 +375,7 @@ const char index_html[] PROGMEM = R"rawliteral(
             break;
             case "5":
             var temp=prompt("Millisekunden von 5:", "50");
-            var letters = /^[1-9]+$/;
+            var letters = /^[0-9]+$/;
             if(temp.match(letters))
             {
             document.getElementById("speedbuttonfive").innerHTML = temp+"ms";
@@ -460,6 +460,7 @@ void setup()
   status = getValue(eeprom, ',', 6);
   minValueAngle = getValue(eeprom, ',', 7);
   maxValueAngle = getValue(eeprom, ',', 8);
+  selection = getValue(eeprom, ',', 9);
   WiFiManager wifiManager;
   wifiManager.autoConnect("Pumpe");
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -500,10 +501,10 @@ void setup()
     {
       inputMessage = request->getParam(PARAM_INPUT)->value();
       status = inputMessage;
-      String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "E");
+      String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "E");
       for (int i = 0; i < defaultSettings.length(); i++)
       {
-      EEPROM.write(0x0F + i, defaultSettings[i]);
+        EEPROM.write(0x0F + i, defaultSettings[i]);
       }
       EEPROM.commit();
     }
@@ -565,7 +566,7 @@ void setup()
           speedfiveButton = String(recievedValue);
           break;
         }
-        String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "E");
+        String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "E");
         for (int i = 0; i < defaultSettings.length(); i++)
         {
           EEPROM.write(0x0F + i, defaultSettings[i]);
