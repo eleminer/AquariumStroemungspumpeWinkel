@@ -327,7 +327,7 @@ const char index_html[] PROGMEM = R"rawliteral(
         {
             case "1":
             var temp=prompt("Millisekunden von 1:", "50");
-            var letters = /^[0-9]+$/;
+            var letters = /^[1-9]+$/;
             if(temp.match(letters))
             {
             document.getElementById("speedbuttonone").innerHTML = temp+"ms";
@@ -339,7 +339,7 @@ const char index_html[] PROGMEM = R"rawliteral(
             break;
             case "2":
             var temp=prompt("Millisekunden von 2:", "50");
-            var letters = /^[0-9]+$/;
+            var letters = /^[1-9]+$/;
             if(temp.match(letters))
             {
             document.getElementById("speedbuttontwo").innerHTML = temp+"ms";
@@ -351,7 +351,7 @@ const char index_html[] PROGMEM = R"rawliteral(
             break;
             case "3":
             var temp=prompt("Millisekunden von 3:", "50");
-            var letters = /^[0-9]+$/;
+            var letters = /^[1-9]+$/;
             if(temp.match(letters))
             {
             document.getElementById("speedbuttonthree").innerHTML = temp+"ms";
@@ -363,7 +363,7 @@ const char index_html[] PROGMEM = R"rawliteral(
             break;
             case "4":
             var temp=prompt("Millisekunden von 4:", "50");
-            var letters = /^[0-9]+$/;
+            var letters = /^[1-9]+$/;
             if(temp.match(letters))
             {
             document.getElementById("speedbuttonfour").innerHTML = temp+"ms";
@@ -375,7 +375,7 @@ const char index_html[] PROGMEM = R"rawliteral(
             break;
             case "5":
             var temp=prompt("Millisekunden von 5:", "50");
-            var letters = /^[0-9]+$/;
+            var letters = /^[1-9]+$/;
             if(temp.match(letters))
             {
             document.getElementById("speedbuttonfive").innerHTML = temp+"ms";
