@@ -36,6 +36,7 @@ Servo myservo;
 int addr = 0;
 char eeprom[1000] = "";
 char *pointer = eeprom;
+char *pointerLoop = eeprom;
 int positionServo = 90;
 int direction = 1;
 const char *PARAM_INPUT = "value";
@@ -53,6 +54,10 @@ String status = "0";
 String selection = "1";
 unsigned long currentTime = 0;
 unsigned long timePoint = 0;
+unsigned long timePointTwo = 0;
+String minValueAngleREAD = "0";
+String maxValueAngleREAD = "0";
+String selectionREAD = "0";
 
 AsyncWebServer server(80);
 
@@ -501,7 +506,7 @@ void setup()
     {
       inputMessage = request->getParam(PARAM_INPUT)->value();
       status = inputMessage;
-      String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "E");
+      String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + "H" + "E");
       for (int i = 0; i < defaultSettings.length(); i++)
       {
         EEPROM.write(0x0F + i, defaultSettings[i]);
@@ -566,7 +571,7 @@ void setup()
           speedfiveButton = String(recievedValue);
           break;
         }
-        String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "E");
+        String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + "H" + "E");
         for (int i = 0; i < defaultSettings.length(); i++)
         {
           EEPROM.write(0x0F + i, defaultSettings[i]);
@@ -582,6 +587,7 @@ void loop()
 {
   currentTime = millis();
   int speed = 100;
+  int intervalEEPROMcheck = 5000;
   int temp = selection.toInt();
   switch (temp)
   {
@@ -652,5 +658,29 @@ void loop()
       }
     }
     timePoint = millis();
+  }
+  if ((unsigned long)currentTime - timePointTwo > intervalEEPROMcheck)
+  {
+    int i = 0;
+    char *temppointer = pointerLoop;
+    while ((char)EEPROM.read(i) != 'E')
+    {
+      *temppointer = (char)EEPROM.read(i);
+      temppointer++;
+      i++;
+    }
+    minValueAngleREAD = getValue(eeprom, ',', 7);
+    maxValueAngleREAD = getValue(eeprom, ',', 8);
+    selectionREAD = getValue(eeprom, ',', 9);
+    if (minValueAngleREAD.toInt() != minValueAngle.toInt() || maxValueAngleREAD.toInt() != maxValueAngle.toInt() || selectionREAD.toInt() != selection.toInt())
+    {
+      String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + "H" + "E");
+      for (int i = 0; i < defaultSettings.length(); i++)
+      {
+        EEPROM.write(0x0F + i, defaultSettings[i]);
+      }
+      EEPROM.commit();
+    }
+    timePointTwo = millis();
   }
 }

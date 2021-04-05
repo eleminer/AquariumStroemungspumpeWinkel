@@ -3,7 +3,7 @@ int addr = 0;
 void setup()
 {
   EEPROM.begin(512);
-  String defaultSettings = ",10,20,30,40,50,1,45,160,1E";
+  String defaultSettings = ",10,20,30,40,50,1,45,160,1,HE";
   for (int i = 0; i < defaultSettings.length(); i++)
   {
     EEPROM.write(0x0F + i, defaultSettings[i]);
