@@ -5,6 +5,12 @@
 #define WIFI_MANAGER_USE_ASYNC_WEB_SERVER
 #include <WiFiManager.h>
 #include <Servo.h>
+#include <NTPClient.h>
+#include <WiFiUdp.h>
+
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP);
+
 
 //nur diese Werte manuell ändern!
 const char *ssid = "Develop";
@@ -58,6 +64,8 @@ unsigned long timePointTwo = 0;
 String minValueAngleREAD = "0";
 String maxValueAngleREAD = "0";
 String selectionREAD = "0";
+String actualTimeString = "44:44:44";
+String summertime="false";
 
 AsyncWebServer server(80);
 
@@ -143,9 +151,30 @@ const char index_html[] PROGMEM = R"rawliteral(
             margin-bottom: 0px;
             text-align: center;
         }
+        .inputfieldtext-group {
+            color: #2196F3;
+            position: relative;
+            margin-top: 10px;
+            margin-bottom: 0px;
+            text-align: center;
+        }
+        #summertimeDIV {
+            position: relative;
+            margin-top: 15px;
+            text-align: center;
+
+        }
         #speedDIV {
             position: relative;
             margin-top: 100px;
+            text-align: center;
+        }
+        #actualTime {
+            color: #2196F3;
+        }
+        #timerDIV {
+            position: relative;
+            margin-top: 20px;
             text-align: center;
         }
         #settingbutton {
@@ -198,6 +227,30 @@ const char index_html[] PROGMEM = R"rawliteral(
     <div id="settingbutton">
     <button id="setting" onclick="alert()"><img src="https://raw.githubusercontent.com/eleminer/AquariumStroemungspumpeWinkel/master/settingPicture.png"height="20%" width="20%"></button> 
     </div>
+    <div id=timerDIV>
+        <p>Uhrzeit und Zeitschaltung:</p>
+    </div>
+    <div class=button-group>
+    <time id=actualTime>00:00:00</time>
+    </div>
+    <div id=summertimeDIV>
+  <label>
+  <input type="checkbox" id="summer" onclick="checkboxValueChanged()" name="summer">
+  Sommerzeit?</label>
+  </div>
+  <div class=inputfieldtext-group>
+  <p>Pause von:</p>
+  <input type="time" name="TimeStop">
+  </div>
+  <div class=inputfieldtext-group>
+  <p>Pause bis:</p>
+  <input type="time" name="TimeResume">
+  </div>
+  <div class=inputfieldtext-group>
+  <p>An der Position:</p>
+  <input type="number" id="tentacles" name="tentacles"
+       min="0" max="180" placeholder=0-180 step=1>
+  </div>
     <script>
 
     function buttonchange(buttonnumber)
@@ -293,6 +346,7 @@ const char index_html[] PROGMEM = R"rawliteral(
     document.getElementById("speedbuttonthree").innerHTML = %SPEEDTHIRDBUTTON%+"ms";
     document.getElementById("speedbuttonfour").innerHTML = %SPEEDFOURBUTTON%+"ms";
     document.getElementById("speedbuttonfive").innerHTML = %SPEEDFIVEBUTTON%+"ms";
+    document.getElementById("summer").checked = %SUMMERTIME%;
     if (%STATUS%==1)
     {
     document.getElementById("onoff").checked = true;
@@ -398,6 +452,37 @@ const char index_html[] PROGMEM = R"rawliteral(
     xhr.send();
     }
 
+    function checkboxValueChanged()
+    {
+      var xhr = new XMLHttpRequest();
+      if(document.getElementById("summer").checked == true)
+      {
+        xhr.open("GET", "/summertime?value=true", true);
+      }
+      else
+      {
+        xhr.open("GET", "/summertime?value=false", true);
+      }
+      xhr.send();
+    }
+
+    function reqListener()
+    {
+      document.getElementById("actualTime").innerHTML = this.responseText;
+    }
+
+    function updateClock()
+    {
+      var tempTime="00:00:00";
+      var xhr = new XMLHttpRequest();
+      xhr.addEventListener("load",reqListener);
+      xhr.open("GET", "/timeRequestPackage", true);
+      xhr.send();
+      
+    }
+
+    setInterval(updateClock, 1000);
+
     </script>
 </body>
 </html>
@@ -440,6 +525,10 @@ String processor(const String &var)
   {
     return speedfiveButton;
   }
+  if (var == "SUMMERTIME")
+  {
+    return summertime;
+  }
 
   return String();
 }
@@ -472,12 +561,31 @@ void setup()
     request->send_P(200, "text/html", index_html, processor);
   });
 
+  server.on("/timeRequestPackage", HTTP_GET, [](AsyncWebServerRequest *request) {
+    String inputMessage;
+    request->send(200, "text/plain", actualTimeString);
+  });
+
   server.on("/sliderMIN", HTTP_GET, [](AsyncWebServerRequest *request) {
     String inputMessage;
     if (request->hasParam(PARAM_INPUT))
     {
       inputMessage = request->getParam(PARAM_INPUT)->value();
       minValueAngle = inputMessage;
+    }
+    else
+    {
+      inputMessage = "No message sent";
+    }
+    request->send(200, "text/plain", "OK");
+  });
+
+  server.on("/summertime", HTTP_GET, [](AsyncWebServerRequest *request) {
+    String inputMessage;
+    if (request->hasParam(PARAM_INPUT))
+    {
+      inputMessage = request->getParam(PARAM_INPUT)->value();
+      summertime = inputMessage;
     }
     else
     {
@@ -581,10 +689,21 @@ void setup()
     }
   });
   server.begin();
+  timeClient.begin();
 }
 
 void loop()
 {
+  timeClient.update();
+  if(summertime=="true")
+  {
+    timeClient.setTimeOffset(7200);
+  }
+  else
+  {
+    timeClient.setTimeOffset(3600);
+  }
+  actualTimeString=String(timeClient.getFormattedTime());
   currentTime = millis();
   int speed = 100;
   int intervalEEPROMcheck = 5000;
