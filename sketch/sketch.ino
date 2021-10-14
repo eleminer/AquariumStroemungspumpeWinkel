@@ -11,13 +11,12 @@
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP);
 
-
-//nur diese Werte manuell ändern!
+// nur diese Werte manuell ändern!
 const char *ssid = "Develop";
 const char *password = "384783478";
-int factorServo = 1; //2, wenn 360°Servo. 1, wenn 180°Servo
+int factorServo = 1; // 2, wenn 360°Servo. 1, wenn 180°Servo
 int servopin = 15;
-//nur diese Werte manuell ändern!
+// nur diese Werte manuell ändern!
 
 String getValue(String data, char separator, int index)
 {
@@ -65,12 +64,12 @@ String minValueAngleREAD = "100";
 String maxValueAngleREAD = "100";
 String selectionREAD = "0";
 
-String summertime="false";
-String BrakePosition="90";
-char BrakeBeginn[6]="17:17";
-char BrakeEnd[6]="0:05";
+String summertime = "false";
+String BrakePosition = "90";
+char BrakeBeginn[6] = "17:17";
+char BrakeEnd[6] = "0:05";
 char actualTimeString[9] = "44:44:44";
-int paused=0;
+int paused = 0;
 
 AsyncWebServer server(80);
 
@@ -556,7 +555,6 @@ String processor(const String &var)
     return BrakeEnd;
   }
 
-
   return String();
 }
 
@@ -584,16 +582,16 @@ void setup()
   selection = getValue(eeprom, ',', 9);
   WiFiManager wifiManager;
   wifiManager.autoConnect("Pumpe");
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send_P(200, "text/html", index_html, processor);
-  });
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
+            { request->send_P(200, "text/html", index_html, processor); });
 
-  server.on("/timeRequestPackage", HTTP_GET, [](AsyncWebServerRequest *request) {
+  server.on("/timeRequestPackage", HTTP_GET, [](AsyncWebServerRequest *request)
+            {
     String inputMessage;
-    request->send(200, "text/plain", actualTimeString);
-  });
+    request->send(200, "text/plain", actualTimeString); });
 
-  server.on("/sliderMIN", HTTP_GET, [](AsyncWebServerRequest *request) {
+  server.on("/sliderMIN", HTTP_GET, [](AsyncWebServerRequest *request)
+            {
     String inputMessage;
     if (request->hasParam(PARAM_INPUT))
     {
@@ -604,10 +602,10 @@ void setup()
     {
       inputMessage = "No message sent";
     }
-    request->send(200, "text/plain", "OK");
-  });
+    request->send(200, "text/plain", "OK"); });
 
-  server.on("/summertime", HTTP_GET, [](AsyncWebServerRequest *request) {
+  server.on("/summertime", HTTP_GET, [](AsyncWebServerRequest *request)
+            {
     String inputMessage;
     if (request->hasParam(PARAM_INPUT))
     {
@@ -618,10 +616,10 @@ void setup()
     {
       inputMessage = "No message sent";
     }
-    request->send(200, "text/plain", "OK");
-  });
+    request->send(200, "text/plain", "OK"); });
 
-  server.on("/sliderMAX", HTTP_GET, [](AsyncWebServerRequest *request) {
+  server.on("/sliderMAX", HTTP_GET, [](AsyncWebServerRequest *request)
+            {
     String inputMessage;
     if (request->hasParam(PARAM_INPUT))
     {
@@ -632,10 +630,10 @@ void setup()
     {
       inputMessage = "No message sent";
     }
-    request->send(200, "text/plain", "OK");
-  });
+    request->send(200, "text/plain", "OK"); });
 
-  server.on("/power", HTTP_GET, [](AsyncWebServerRequest *request) {
+  server.on("/power", HTTP_GET, [](AsyncWebServerRequest *request)
+            {
     String inputMessage;
     if (request->hasParam(PARAM_INPUT))
     {
@@ -652,10 +650,10 @@ void setup()
     {
       inputMessage = "No message sent";
     }
-    request->send(200, "text/plain", "OK");
-  });
+    request->send(200, "text/plain", "OK"); });
 
-  server.on("/button", HTTP_GET, [](AsyncWebServerRequest *request) {
+  server.on("/button", HTTP_GET, [](AsyncWebServerRequest *request)
+            {
     String inputMessage;
     if (request->hasParam(PARAM_INPUT))
     {
@@ -666,10 +664,10 @@ void setup()
     {
       inputMessage = "No message sent1";
     }
-    request->send(200, "text/plain", "OK");
-  });
+    request->send(200, "text/plain", "OK"); });
 
-  server.on("/buttonValues", HTTP_GET, [](AsyncWebServerRequest *request) {
+  server.on("/buttonValues", HTTP_GET, [](AsyncWebServerRequest *request)
+            {
     String inputMessage;
     String inputMessageSecond;
     if (request->hasParam(PARAM_INPUT))
@@ -713,8 +711,7 @@ void setup()
         }
         EEPROM.commit();
       }
-    }
-  });
+    } });
   server.begin();
   timeClient.begin();
 }
@@ -722,7 +719,7 @@ void setup()
 void loop()
 {
   timeClient.update();
-  if(summertime=="true")
+  if (summertime == "true")
   {
     timeClient.setTimeOffset(7200);
   }
@@ -730,26 +727,26 @@ void loop()
   {
     timeClient.setTimeOffset(3600);
   }
-  (timeClient.getFormattedTime()).toCharArray(actualTimeString,9);
+  (timeClient.getFormattedTime()).toCharArray(actualTimeString, 9);
 
-  int firstHourActual=(String(actualTimeString[0])).toInt();
-  int secondHourActual=(String(actualTimeString[1])).toInt();
-  int firstMinActual=(String(actualTimeString[3])).toInt();
-  int secondMinActual=(String(actualTimeString[4])).toInt();
+  int firstHourActual = (String(actualTimeString[0])).toInt();
+  int secondHourActual = (String(actualTimeString[1])).toInt();
+  int firstMinActual = (String(actualTimeString[3])).toInt();
+  int secondMinActual = (String(actualTimeString[4])).toInt();
 
-  int firstHourBeginn=(String(BrakeBeginn[0])).toInt();
-  int secondHourBeginn=(String(BrakeBeginn[1])).toInt();
-  int firstMinBeginn=(String(BrakeBeginn[3])).toInt();
-  int secondMinBeginn=(String(BrakeBeginn[4])).toInt();
+  int firstHourBeginn = (String(BrakeBeginn[0])).toInt();
+  int secondHourBeginn = (String(BrakeBeginn[1])).toInt();
+  int firstMinBeginn = (String(BrakeBeginn[3])).toInt();
+  int secondMinBeginn = (String(BrakeBeginn[4])).toInt();
 
-  int firstHourEnd=(String(BrakeEnd[0])).toInt();
-  int secondHourEnd=(String(BrakeEnd[1])).toInt();
-  int firstMinEnd=(String(BrakeEnd[3])).toInt();
-  int secondMinEnd=(String(BrakeEnd[4])).toInt();
+  int firstHourEnd = (String(BrakeEnd[0])).toInt();
+  int secondHourEnd = (String(BrakeEnd[1])).toInt();
+  int firstMinEnd = (String(BrakeEnd[3])).toInt();
+  int secondMinEnd = (String(BrakeEnd[4])).toInt();
 
-  int numberActualMinutes=firstHourActual*600+secondHourActual*60+firstMinActual*10+secondMinActual;
-  int numberBeginnMinutes=firstHourBeginn*600+secondHourBeginn*60+firstMinBeginn*10+secondMinBeginn;
-  int numberEndMinutes=firstHourEnd*600+secondHourEnd*60+firstMinEnd*10+secondMinEnd;
+  int numberActualMinutes = firstHourActual * 600 + secondHourActual * 60 + firstMinActual * 10 + secondMinActual;
+  int numberBeginnMinutes = firstHourBeginn * 600 + secondHourBeginn * 60 + firstMinBeginn * 10 + secondMinBeginn;
+  int numberEndMinutes = firstHourEnd * 600 + secondHourEnd * 60 + firstMinEnd * 10 + secondMinEnd;
 
   currentTime = millis();
   int speed = 100;
@@ -777,59 +774,59 @@ void loop()
   }
   if ((unsigned long)currentTime - timePoint > speed)
   {
-    if(numberBeginnMinutes>=numberEndMinutes)
+    if (numberBeginnMinutes >= numberEndMinutes)
     {
-      //special case
-      if(numberActualMinutes>=numberBeginnMinutes || numberActualMinutes<numberEndMinutes)
+      // special case
+      if (numberActualMinutes >= numberBeginnMinutes || numberActualMinutes < numberEndMinutes)
       {
-        paused=1;
+        paused = 1;
       }
       else
       {
-        paused=0;
+        paused = 0;
       }
     }
     else
     {
-      if(numberActualMinutes>=numberBeginnMinutes && numberActualMinutes<numberEndMinutes)
+      if (numberActualMinutes >= numberBeginnMinutes && numberActualMinutes < numberEndMinutes)
       {
-        paused=1;
+        paused = 1;
       }
       else
       {
-        paused=0;
+        paused = 0;
       }
     }
-    
-    if(paused == 1 && status == "1")
+
+    if (paused == 1 && status == "1")
+    {
+      if (positionServo >= BrakePosition.toInt())
       {
-        if(positionServo>=BrakePosition.toInt())
+        positionServo--;
+        myservo.write(positionServo);
+        if ((positionServo) >= (maxValueAngle.toInt()))
         {
-          positionServo--;
-          myservo.write(positionServo);
-          if ((positionServo) >= (maxValueAngle.toInt()))
-            {
-              direction = 0;
-            }
-            if ((positionServo) <= (minValueAngle.toInt()))
-            {
-              direction = 1;
-            }
+          direction = 0;
         }
-        if(positionServo<BrakePosition.toInt())
+        if ((positionServo) <= (minValueAngle.toInt()))
         {
-          positionServo++;
-          myservo.write(positionServo);
-          if ((positionServo) >= (maxValueAngle.toInt()))
-            {
-              direction = 0;
-            }
-            if ((positionServo) <= (minValueAngle.toInt()))
-            {
-              direction = 1;
-            }
+          direction = 1;
         }
       }
+      if (positionServo < BrakePosition.toInt())
+      {
+        positionServo++;
+        myservo.write(positionServo);
+        if ((positionServo) >= (maxValueAngle.toInt()))
+        {
+          direction = 0;
+        }
+        if ((positionServo) <= (minValueAngle.toInt()))
+        {
+          direction = 1;
+        }
+      }
+    }
 
     if (status == "1" && factorServo == 1 && paused == 0)
     {
