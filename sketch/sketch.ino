@@ -800,7 +800,7 @@ void loop()
 
     if (paused == 1 && status == "1")
     {
-      if (positionServo >= BrakePosition.toInt())
+      if (positionServo > BrakePosition.toInt())
       {
         positionServo--;
         myservo.write(positionServo);
