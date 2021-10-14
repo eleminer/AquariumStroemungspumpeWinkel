@@ -476,15 +476,21 @@ const char index_html[] PROGMEM = R"rawliteral(
 
     function updateClock()
     {
-      var tempTime="00:00:00";
       var xhr = new XMLHttpRequest();
       xhr.addEventListener("load",reqListener);
       xhr.open("GET", "/timeRequestPackage", true);
       xhr.send();
-      
     }
 
-    setInterval(updateClock, 1000);
+    document.addEventListener('visibilitychange', function (event) {
+    if (document.hidden) {
+        clearInterval(handle);
+    } else {
+        document.location.reload(true)
+    }
+    });
+
+    var handle=setInterval(updateClock, 1000);
 
     </script>
 </body>
