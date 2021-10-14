@@ -65,11 +65,11 @@ String minValueAngleREAD = "100";
 String maxValueAngleREAD = "100";
 String selectionREAD = "0";
 
-String actualTimeString = "44:44:44";
 String summertime="false";
 String BrakePosition="90";
-String BrakeBeginn="22:00";
-String BrakeEnd="10:00";
+char BrakeBeginn[6]="22:00";
+char BrakeEnd[6]="10:00";
+char actualTimeString[9] = "44:44:44";
 
 AsyncWebServer server(80);
 
@@ -247,16 +247,16 @@ const char index_html[] PROGMEM = R"rawliteral(
   </div>
   <div class=inputfieldtext-group>
   <p>Pause von:</p>
-  <input type="time" name="TimeStop">
+  <input type="time" value=%BRAKEBEGINN% name="TimeStop">
   </div>
   <div class=inputfieldtext-group>
   <p>Pause bis:</p>
-  <input type="time" name="TimeResume">
+  <input type="time" value=%BRAKEEND% name="TimeResume">
   </div>
   <div class=inputfieldtext-group id=placeholderBottom>
   <p>An der Position:</p>
   <input type="number" id="tentacles" name="tentacles"
-       min="0" max="180" placeholder=0-180 step=1>
+       min="0" max="180" value=%BRAKEPOSITION% step=1>
   </div>
     <script>
 
@@ -729,7 +729,9 @@ void loop()
   {
     timeClient.setTimeOffset(3600);
   }
-  actualTimeString=String(timeClient.getFormattedTime());
+  (timeClient.getFormattedTime()).toCharArray(actualTimeString,9);
+
+  Serial.prinltn((actualTime[0].toInt());
   currentTime = millis();
   int speed = 100;
   int intervalEEPROMcheck = 5000;
