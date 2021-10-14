@@ -68,8 +68,9 @@ String selectionREAD = "0";
 String summertime="false";
 String BrakePosition="90";
 char BrakeBeginn[6]="22:00";
-char BrakeEnd[6]="10:00";
+char BrakeEnd[6]="1:00";
 char actualTimeString[9] = "44:44:44";
+int paused=0;
 
 AsyncWebServer server(80);
 
@@ -731,7 +732,25 @@ void loop()
   }
   (timeClient.getFormattedTime()).toCharArray(actualTimeString,9);
 
-  Serial.prinltn((actualTime[0].toInt());
+  int firstHourActual=(String(actualTimeString[0])).toInt();
+  int secondHourActual=(String(actualTimeString[1])).toInt();
+  int firstMinActual=(String(actualTimeString[3])).toInt();
+  int secondMinActual=(String(actualTimeString[4])).toInt();
+
+  int firstHourBeginn=(String(BrakeBeginn[0])).toInt();
+  int secondHourBeginn=(String(BrakeBeginn[1])).toInt();
+  int firstMinBeginn=(String(BrakeBeginn[3])).toInt();
+  int secondMinBeginn=(String(BrakeBeginn[4])).toInt();
+
+  int firstHourEnd=(String(BrakeEnd[0])).toInt();
+  int secondHourEnd=(String(BrakeEnd[1])).toInt();
+  int firstMinEnd=(String(BrakeEnd[3])).toInt();
+  int secondMinEnd=(String(BrakeEnd[4])).toInt();
+
+  int numberActualMinutes=firstHourActual*600+secondHourActual*60+firstMinActual*10+secondMinActual;
+  int numberBeginnMinutes=firstHourBeginn*600+secondHourBeginn*60+firstMinBeginn*10+secondMinBeginn;
+  int numberEndMinutes=firstHourEnd*600+secondHourEnd*60+firstMinEnd*10+secondMinEnd;
+
   currentTime = millis();
   int speed = 100;
   int intervalEEPROMcheck = 5000;
@@ -758,7 +777,52 @@ void loop()
   }
   if ((unsigned long)currentTime - timePoint > speed)
   {
-    if (status == "1" && factorServo == 1)
+    int differenceTimeMinutes=0;
+    if(numberBeginnMinutes>=numberEndMinutes)
+    {
+      differenceTimeMinutes=numberBeginnMinutes-numberEndMinutes;
+    }
+    else
+    {
+      differenceTimeMinutes=numberEndMinutes-numberBeginnMinutes;
+    }
+    Serial.println(String(differenceTimeMinutes));
+    if( 1 && status== "1")
+      {
+      paused=1;
+        if(positionServo>BrakePosition.toInt())
+        {
+          positionServo--;
+          myservo.write(positionServo);
+          if ((positionServo) >= (maxValueAngle.toInt()))
+            {
+              direction = 0;
+            }
+            if ((positionServo) <= (minValueAngle.toInt()))
+            {
+              direction = 1;
+            }
+        }
+        if(positionServo<BrakePosition.toInt())
+        {
+          positionServo++;
+          myservo.write(positionServo);
+          if ((positionServo) >= (maxValueAngle.toInt()))
+            {
+              direction = 0;
+            }
+            if ((positionServo) <= (minValueAngle.toInt()))
+            {
+              direction = 1;
+            }
+        }
+      }
+      else
+      {
+        paused=0;
+      }
+
+    if (status == "1" && factorServo == 1 && paused== 0)
     {
       if (direction == 1)
       {
@@ -779,7 +843,7 @@ void loop()
       }
     }
 
-    if (status == "1" && factorServo == 2)
+    if (status == "1" && factorServo == 2 && paused== 0)
     {
       if (direction == 1)
       {
