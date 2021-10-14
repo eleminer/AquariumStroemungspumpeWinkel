@@ -49,23 +49,27 @@ const char *PARAM_INPUT = "value";
 const char *PARAM_INPUT_SECOND = "buttonN";
 int recievedValue = 0;
 int recievedButtonNumber = 0;
-String speedfirstButton = "50";
-String speedsecondButton = "1";
-String speedthirdButton = "2";
-String speedfourButton = "3";
-String speedfiveButton = "4";
+String speedfirstButton = "999999";
+String speedsecondButton = "999999";
+String speedthirdButton = "999999";
+String speedfourButton = "999999";
+String speedfiveButton = "999999";
 String maxValueAngle = "135";
-String minValueAngle = "45";
+String minValueAngle = "100";
 String status = "0";
 String selection = "1";
 unsigned long currentTime = 0;
 unsigned long timePoint = 0;
 unsigned long timePointTwo = 0;
-String minValueAngleREAD = "0";
-String maxValueAngleREAD = "0";
+String minValueAngleREAD = "100";
+String maxValueAngleREAD = "100";
 String selectionREAD = "0";
+
 String actualTimeString = "44:44:44";
 String summertime="false";
+String BrakePosition="90";
+String BrakeBeginn="22:00";
+String BrakeEnd="10:00";
 
 AsyncWebServer server(80);
 
@@ -538,6 +542,19 @@ String processor(const String &var)
   {
     return summertime;
   }
+  if (var == "BRAKEPOSITION")
+  {
+    return BrakePosition;
+  }
+  if (var == "BRAKEBEGINN")
+  {
+    return BrakeBeginn;
+  }
+  if (var == "BRAKEEND")
+  {
+    return BrakeEnd;
+  }
+
 
   return String();
 }
