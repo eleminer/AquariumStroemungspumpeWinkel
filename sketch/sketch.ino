@@ -67,8 +67,8 @@ String selectionREAD = "0";
 
 String summertime="false";
 String BrakePosition="90";
-char BrakeBeginn[6]="22:00";
-char BrakeEnd[6]="1:00";
+char BrakeBeginn[6]="17:17";
+char BrakeEnd[6]="0:05";
 char actualTimeString[9] = "44:44:44";
 int paused=0;
 
@@ -777,20 +777,33 @@ void loop()
   }
   if ((unsigned long)currentTime - timePoint > speed)
   {
-    int differenceTimeMinutes=0;
     if(numberBeginnMinutes>=numberEndMinutes)
     {
-      differenceTimeMinutes=numberBeginnMinutes-numberEndMinutes;
+      //special case
+      if(numberActualMinutes>=numberBeginnMinutes || numberActualMinutes<numberEndMinutes)
+      {
+        paused=1;
+      }
+      else
+      {
+        paused=0;
+      }
     }
     else
     {
-      differenceTimeMinutes=numberEndMinutes-numberBeginnMinutes;
-    }
-    Serial.println(String(differenceTimeMinutes));
-    if( 1 && status== "1")
+      if(numberActualMinutes>=numberBeginnMinutes && numberActualMinutes<numberEndMinutes)
       {
-      paused=1;
-        if(positionServo>BrakePosition.toInt())
+        paused=1;
+      }
+      else
+      {
+        paused=0;
+      }
+    }
+    
+    if(paused == 1 && status == "1")
+      {
+        if(positionServo>=BrakePosition.toInt())
         {
           positionServo--;
           myservo.write(positionServo);
@@ -817,12 +830,8 @@ void loop()
             }
         }
       }
-      else
-      {
-        paused=0;
-      }
 
-    if (status == "1" && factorServo == 1 && paused== 0)
+    if (status == "1" && factorServo == 1 && paused == 0)
     {
       if (direction == 1)
       {
@@ -843,7 +852,7 @@ void loop()
       }
     }
 
-    if (status == "1" && factorServo == 2 && paused== 0)
+    if (status == "1" && factorServo == 2 && paused == 0)
     {
       if (direction == 1)
       {
