@@ -189,6 +189,9 @@ const char index_html[] PROGMEM = R"rawliteral(
             margin-top: 0%;
             font-size: 15px;
         }
+        #placeholderBottom {
+          padding-bottom: 20px;
+        }
     </style>
     <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
     <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
@@ -246,7 +249,7 @@ const char index_html[] PROGMEM = R"rawliteral(
   <p>Pause bis:</p>
   <input type="time" name="TimeResume">
   </div>
-  <div class=inputfieldtext-group>
+  <div class=inputfieldtext-group id=placeholderBottom>
   <p>An der Position:</p>
   <input type="number" id="tentacles" name="tentacles"
        min="0" max="180" placeholder=0-180 step=1>
