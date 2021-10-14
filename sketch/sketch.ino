@@ -65,8 +65,8 @@ String maxValueAngleREAD = "100";
 String selectionREAD = "0";
 
 String summertime = "false";
-String BrakePosition = "90";
-char BrakeBeginn[6] = "17:17";
+String BrakePosition = "170";
+char BrakeBeginn[6] = "18:45";
 char BrakeEnd[6] = "0:05";
 char actualTimeString[9] = "44:44:44";
 int paused = 0;
