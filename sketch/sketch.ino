@@ -247,16 +247,16 @@ const char index_html[] PROGMEM = R"rawliteral(
   </div>
   <div class=inputfieldtext-group>
   <p>Pause von:</p>
-  <input type="time" value=%BRAKEBEGINN% name="TimeStop">
+  <input id=userInputBeginn type="time" value=%BRAKEBEGINN% name="TimeStop">
   </div>
   <div class=inputfieldtext-group>
   <p>Pause bis:</p>
-  <input type="time" value=%BRAKEEND% name="TimeResume">
+  <input id=userInputEnd type="time" value=%BRAKEEND% name="TimeResume">
   </div>
   <div class=inputfieldtext-group id=placeholderBottom>
   <p>An der Position:</p>
   <input type="number" id="tentacles" name="tentacles"
-       min="0" max="180" value=%BRAKEPOSITION% step=1>
+       min="0" max="180" step="1" value=%BRAKEPOSITION% step=1>
   </div>
     <script>
 
@@ -496,6 +496,29 @@ const char index_html[] PROGMEM = R"rawliteral(
 
     var handle=setInterval(updateClock, 1000);
 
+
+    var startTime = document.getElementById("userInputBeginn");
+    startTime.addEventListener("input", function() {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/startTime?value="+String(userInputBeginn.value), true);
+    xhr.send();
+    }, true);
+
+    var endTime = document.getElementById("userInputEnd");
+    endTime.addEventListener("input", function() {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/endTime?value="+String(userInputEnd.value), true);
+    xhr.send();
+    }, true);
+
+    var postionBrake = document.getElementById("tentacles");
+    postionBrake.addEventListener("input", function() {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/positionBrake?value="+String(tentacles.value), true);
+    xhr.send();
+    }, true);
+
+    
     </script>
 </body>
 </html>
@@ -611,6 +634,51 @@ void setup()
     {
       inputMessage = request->getParam(PARAM_INPUT)->value();
       summertime = inputMessage;
+    }
+    else
+    {
+      inputMessage = "No message sent";
+    }
+    request->send(200, "text/plain", "OK"); });
+
+
+  server.on("/startTime", HTTP_GET, [](AsyncWebServerRequest *request)
+            {
+    String inputMessage;
+    if (request->hasParam(PARAM_INPUT))
+    {
+      inputMessage = request->getParam(PARAM_INPUT)->value();
+      inputMessage.toCharArray(BrakeBeginn, 6);
+    }
+    else
+    {
+      inputMessage = "No message sent";
+    }
+    request->send(200, "text/plain", "OK"); });
+
+
+    server.on("/endTime", HTTP_GET, [](AsyncWebServerRequest *request)
+            {
+    String inputMessage;
+    if (request->hasParam(PARAM_INPUT))
+    {
+      inputMessage = request->getParam(PARAM_INPUT)->value();
+      inputMessage.toCharArray(BrakeEnd, 6);
+    }
+    else
+    {
+      inputMessage = "No message sent";
+    }
+    request->send(200, "text/plain", "OK"); });
+
+
+    server.on("/positionBrake", HTTP_GET, [](AsyncWebServerRequest *request)
+            {
+    String inputMessage;
+    if (request->hasParam(PARAM_INPUT))
+    {
+      inputMessage = request->getParam(PARAM_INPUT)->value();
+      BrakePosition = inputMessage;
     }
     else
     {
