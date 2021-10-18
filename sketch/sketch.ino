@@ -9,7 +9,7 @@
 #include <WiFiUdp.h>
 
 WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP);
+NTPClient timeClient(ntpUDP,"pool.ntp.org", 36000, 60000);
 
 // nur diese Werte manuell ändern!
 const char *ssid = "Develop";
@@ -37,6 +37,7 @@ String getValue(String data, char separator, int index)
   return found > index ? data.substring(strIndex[0], strIndex[1]) : "";
 }
 
+const int led = 2;
 Servo myservo;
 int addr = 0;
 char eeprom[1000] = "";
@@ -77,6 +78,7 @@ char BrakeBeginn[6] = "18:45";
 char BrakeEnd[6] = "00:05";
 char actualTimeString[9] = "44:44:44";
 int paused = 0;
+bool errorTime=0;
 
 AsyncWebServer server(80);
 
@@ -614,6 +616,8 @@ String processor(const String &var)
 
 void setup()
 {
+  pinMode(led, OUTPUT);
+  digitalWrite(led, 0);
   myservo.attach(servopin);
   myservo.write(positionServo * factorServo);
   EEPROM.begin(512);
@@ -836,7 +840,17 @@ void setup()
 
 void loop()
 {
-  timeClient.update();
+  if(timeClient.update()) {
+      digitalWrite(led, 1);
+      errorTime=0;
+  }
+  else
+  {
+    digitalWrite(led, 0);
+    errorTime=1;
+  }
+
+
   if (summertime == "true")
   {
     timeClient.setTimeOffset(7200);
@@ -895,7 +909,7 @@ void loop()
     if (numberBeginnMinutes >= numberEndMinutes)
     {
       // special case
-      if ((numberActualMinutes >= numberBeginnMinutes || numberActualMinutes < numberEndMinutes) && automatic=="true")
+      if ((numberActualMinutes >= numberBeginnMinutes || numberActualMinutes < numberEndMinutes) && automatic=="true" && !errorTime)
       {
         paused = 1;
       }
@@ -906,7 +920,7 @@ void loop()
     }
     else
     {
-      if ((numberActualMinutes >= numberBeginnMinutes && numberActualMinutes < numberEndMinutes) && automatic=="true")
+      if ((numberActualMinutes >= numberBeginnMinutes && numberActualMinutes < numberEndMinutes) && automatic=="true" && !errorTime)
       {
         paused = 1;
       }
