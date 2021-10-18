@@ -68,8 +68,10 @@ String BrakeBeginnREAD = "10:00";
 String BrakeEndREAD = "20:00";
 String summertimeREAD = "false";
 String BrakePositionREAD = "110";
+String automaticREAD="false";
 
 String summertime = "false";
+String automatic = "false";
 String BrakePosition = "170";
 char BrakeBeginn[6] = "18:45";
 char BrakeEnd[6] = "00:05";
@@ -258,10 +260,15 @@ const char index_html[] PROGMEM = R"rawliteral(
   <p>Pause bis:</p>
   <input id=userInputEnd type="time" value=%BRAKEEND% name="TimeResume">
   </div>
-  <div class=inputfieldtext-group id=placeholderBottom>
+  <div class=inputfieldtext-group>
   <p>An der Position:</p>
   <input type="number" id="tentacles" name="tentacles"
        min="0" max="180" step="1" value=%BRAKEPOSITION% step=1>
+  </div>
+  <div class=inputfieldtext-group id=placeholderBottom>
+  <label>
+  <input type="checkbox" id="automaticSwitch" onclick="checkboxAutomatic()" name="onoff">
+  Zeitschaltung?</label>
   </div>
     <script>
 
@@ -359,6 +366,7 @@ const char index_html[] PROGMEM = R"rawliteral(
     document.getElementById("speedbuttonfour").innerHTML = %SPEEDFOURBUTTON%+"ms";
     document.getElementById("speedbuttonfive").innerHTML = %SPEEDFIVEBUTTON%+"ms";
     document.getElementById("summer").checked = %SUMMERTIME%;
+    document.getElementById("automaticSwitch").checked = %AUTOMATIC%;
     if (%STATUS%==1)
     {
     document.getElementById("onoff").checked = true;
@@ -478,6 +486,20 @@ const char index_html[] PROGMEM = R"rawliteral(
       xhr.send();
     }
 
+    function checkboxAutomatic()
+    {
+      var xhr = new XMLHttpRequest();
+      if(document.getElementById("automaticSwitch").checked == true)
+      {
+        xhr.open("GET", "/automatic?value=true", true);
+      }
+      else
+      {
+        xhr.open("GET", "/automatic?value=false", true);
+      }
+      xhr.send();
+    }
+
     function reqListener()
     {
       document.getElementById("actualTime").innerHTML = this.responseText;
@@ -582,6 +604,10 @@ String processor(const String &var)
   {
     return BrakeEnd;
   }
+  if (var == "AUTOMATIC")
+  {
+    return automatic;
+  }
 
   return String();
 }
@@ -612,6 +638,7 @@ void setup()
   (getValue(eeprom, ',', 11)).toCharArray(BrakeBeginn, 6);
   (getValue(eeprom, ',', 12)).toCharArray(BrakeEnd, 6);
   BrakePosition = getValue(eeprom, ',', 13);
+  automatic = getValue(eeprom, ',', 14);
   WiFiManager wifiManager;
   wifiManager.autoConnect("Pumpe");
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
@@ -643,6 +670,20 @@ void setup()
     {
       inputMessage = request->getParam(PARAM_INPUT)->value();
       summertime = inputMessage;
+    }
+    else
+    {
+      inputMessage = "No message sent";
+    }
+    request->send(200, "text/plain", "OK"); });
+
+  server.on("/automatic", HTTP_GET, [](AsyncWebServerRequest *request)
+            {
+    String inputMessage;
+    if (request->hasParam(PARAM_INPUT))
+    {
+      inputMessage = request->getParam(PARAM_INPUT)->value();
+      automatic = inputMessage;
     }
     else
     {
@@ -716,7 +757,7 @@ void setup()
     {
       inputMessage = request->getParam(PARAM_INPUT)->value();
       status = inputMessage;
-      String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + ","  + "H" + "E");
+      String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + "," + String(automatic) + ","  + "H" + "E");
       for (int i = 0; i < defaultSettings.length(); i++)
       {
         EEPROM.write(0x0F + i, defaultSettings[i]);
@@ -781,7 +822,7 @@ void setup()
           speedfiveButton = String(recievedValue);
           break;
         }
-        String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + ","  + "H" + "E");
+        String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + "," + String(automatic) + ","  + "H" + "E");
         for (int i = 0; i < defaultSettings.length(); i++)
         {
           EEPROM.write(0x0F + i, defaultSettings[i]);
@@ -854,7 +895,7 @@ void loop()
     if (numberBeginnMinutes >= numberEndMinutes)
     {
       // special case
-      if (numberActualMinutes >= numberBeginnMinutes || numberActualMinutes < numberEndMinutes)
+      if ((numberActualMinutes >= numberBeginnMinutes || numberActualMinutes < numberEndMinutes) && automatic=="true")
       {
         paused = 1;
       }
@@ -865,7 +906,7 @@ void loop()
     }
     else
     {
-      if (numberActualMinutes >= numberBeginnMinutes && numberActualMinutes < numberEndMinutes)
+      if ((numberActualMinutes >= numberBeginnMinutes && numberActualMinutes < numberEndMinutes) && automatic=="true")
       {
         paused = 1;
       }
@@ -971,9 +1012,10 @@ void loop()
     BrakeBeginnREAD = getValue(eeprom, ',', 11);
     BrakeEndREAD = getValue(eeprom, ',', 12);
     BrakePositionREAD = getValue(eeprom, ',', 13);
-    if (minValueAngleREAD.toInt() != minValueAngle.toInt() || maxValueAngleREAD.toInt() != maxValueAngle.toInt() || selectionREAD.toInt() != selection.toInt() || String(summertimeREAD) != String(summertime) || String(BrakeBeginnREAD) != String(BrakeBeginn) || String(BrakeEndREAD) != String(BrakeEnd) || String(BrakePositionREAD) != String(BrakePosition))
+    automaticREAD = getValue(eeprom, ',', 14);
+    if (minValueAngleREAD.toInt() != minValueAngle.toInt() || maxValueAngleREAD.toInt() != maxValueAngle.toInt() || selectionREAD.toInt() != selection.toInt() || String(summertimeREAD) != String(summertime) || String(BrakeBeginnREAD) != String(BrakeBeginn) || String(BrakeEndREAD) != String(BrakeEnd) || String(BrakePositionREAD) != String(BrakePosition) || String(automaticREAD) != String(automatic))
     {
-      String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + ","  + "H" + "E");
+      String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + "," + String(automatic) + ","  + "H" + "E");
       for (int i = 0; i < defaultSettings.length(); i++)
       {
         EEPROM.write(0x0F + i, defaultSettings[i]);
