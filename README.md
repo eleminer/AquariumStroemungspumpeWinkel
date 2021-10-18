@@ -101,7 +101,17 @@ Darauf sollte man sich jedoch nicht verlassen!
 
 ### Neu:
 
-Im Hintergrund wird ein NTP Server angepingt. Falls der Zeitserver nicht erreichbar ist bzw. die Zeit nicht korrekt abgefragt werden kann, leuchtet die interne (blaue) LED vom ESP auf.
+Im neuem Sketch wird ein NTP Server intervallmäßig angepingt um die Zeit zu synchronisieren.
+Im Falle eines WLAN Abbruchs hört der ESP auf den NTp Server anzupingen und verlässt sich auf seine gespeicherten Werte, die jedoch mit der Zeit abweichen können.
+Sollte die WLAN Verbindung vorhanden sien, aber der Server nicht erreichbar, dann versucht der ESP mehrmals diesen anzupingen.
+
+Während dieser Zeit wird die GUI und das Programm an sich stark eingeschränkt.
+Die blaue LED am ESP leuchtet auf.
+
+Falls erfolgreich: blaue LED geht aus und Programm läuft wie gewohnt.
+Falls nicht erfolgreich: blaue LED bleibt an, die Synchronisierung wird deaktivert. !Fehlerfall, Handlungsbedarf!!!!
+
+Ein erneuter Ping Versuch kann durch Neustart des Gerätes oder durch betätigen des An/Aus Schalters auf der GUI durchgeführt werden.
 
 ## 8. Schnellstart ESP8266
 
@@ -117,3 +127,15 @@ Im Hintergrund wird ein NTP Server angepingt. Falls der Zeitserver nicht erreich
 10. ESP neu starten
 11. Mit der ESP URL verbinden und den Servo einstellen.
 12. Kaffe holen, du hast es geschafft. :)
+
+### Empfohlen, eigener NTP Server (z.B FritzBox): 
+
+
+Im ESP Flasher liegen zwei exportiere Binaries für den Sketch:
+
+    - NewSketch8266.ino.generic.bin
+    - FritzNewSketch8266.ino.generic.bin
+    
+    
+Bei der Version mit "Fritz" am Anfang wird kein externer NTP Server verwendet sondern die FritzBox, falls vorhanden.
+Dafür muss der Zeitserver in der FritzBox aktiviert werden: siehe hier: [Infoseite](https://avm.de/service/wissensdatenbank/dok/FRITZ-Box-7590/336_Zeitsynchronisation-NTP-fur-FRITZ-Box-und-Netzwerkgerate-einrichten/)
