@@ -102,8 +102,8 @@ Darauf sollte man sich jedoch nicht verlassen!
 ### Neu:
 
 Im neuem Sketch wird ein NTP Server intervallmäßig angepingt um die Zeit zu synchronisieren.
-Im Falle eines WLAN Abbruchs hört der ESP auf den NTp Server anzupingen und verlässt sich auf seine gespeicherten Werte, die jedoch mit der Zeit abweichen können.
-Sollte die WLAN Verbindung vorhanden sien, aber der Server nicht erreichbar, dann versucht der ESP mehrmals diesen anzupingen.
+Im Falle eines WLAN Abbruchs hört der ESP auf den NTP Server anzupingen und verlässt sich auf seine gespeicherten Werte, die jedoch mit der Zeit abweichen können.
+Sollte die WLAN Verbindung vorhanden sein, aber der Server nicht erreichbar, dann versucht der ESP mehrmals diesen anzupingen.
 
 Während dieser Zeit wird die GUI und das Programm an sich stark eingeschränkt.
 Die blaue LED am ESP leuchtet auf.
