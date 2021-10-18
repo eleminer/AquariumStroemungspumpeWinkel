@@ -104,8 +104,8 @@ Darauf sollte man sich jedoch nicht verlassen!
 1. Dieses Repository klonen (kopieren) und gegebenfalls extrahieren.
 2. ESPEasyFlasher-master öffnen.
 3. FlashESP8266.exe öffnen.
-4. EEPROM flashen.
-5. sketch flashen (Auswahl zwischen 180Grad oder 360Grad Servo).
+4. EEPROM flashen. (NewEEPROM8266_flasher.ino.generic.bin)
+5. sketch flashen. (NewSketch8266.ino.generic.bin)
 6. Mit WLAN Pumpe verbinden.
 7. 192.168.4.1 URL öffnen.
 8. WIFI einstellen.
