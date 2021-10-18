@@ -78,7 +78,8 @@ char BrakeBeginn[6] = "18:45";
 char BrakeEnd[6] = "00:05";
 char actualTimeString[9] = "44:44:44";
 int paused = 0;
-bool errorTime=0;
+int errorTime=0;
+bool ntpstatus=1;
 
 AsyncWebServer server(80);
 
@@ -761,6 +762,7 @@ void setup()
     {
       inputMessage = request->getParam(PARAM_INPUT)->value();
       status = inputMessage;
+      ntpstatus=1;
       String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + "," + String(automatic) + ","  + "H" + "E");
       for (int i = 0; i < defaultSettings.length(); i++)
       {
@@ -836,18 +838,30 @@ void setup()
     } });
   server.begin();
   timeClient.begin();
+  timeClient.update();
 }
 
 void loop()
 {
-  if(timeClient.update()) {
-      digitalWrite(led, 1);
-      errorTime=0;
-  }
-  else
+
+  if(ntpstatus)
   {
-    digitalWrite(led, 0);
-    errorTime=1;
+    if(timeClient.update()) {
+        digitalWrite(led, 1);
+        errorTime=0;
+    }
+    else
+    {
+      digitalWrite(led, 0);
+      errorTime++;
+    }
+    if(errorTime>=15)
+    {
+      Serial.println("error with ntp, shutdown the connection");
+      digitalWrite(led, 0);
+      errorTime=0;
+      ntpstatus=0;
+    }
   }
 
 
@@ -909,7 +923,7 @@ void loop()
     if (numberBeginnMinutes >= numberEndMinutes)
     {
       // special case
-      if ((numberActualMinutes >= numberBeginnMinutes || numberActualMinutes < numberEndMinutes) && automatic=="true" && !errorTime)
+      if ((numberActualMinutes >= numberBeginnMinutes || numberActualMinutes < numberEndMinutes) && automatic=="true")
       {
         paused = 1;
       }
@@ -920,7 +934,7 @@ void loop()
     }
     else
     {
-      if ((numberActualMinutes >= numberBeginnMinutes && numberActualMinutes < numberEndMinutes) && automatic=="true" && !errorTime)
+      if ((numberActualMinutes >= numberBeginnMinutes && numberActualMinutes < numberEndMinutes) && automatic=="true")
       {
         paused = 1;
       }
