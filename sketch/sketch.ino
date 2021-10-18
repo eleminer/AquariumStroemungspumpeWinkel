@@ -60,9 +60,14 @@ String selection = "1";
 unsigned long currentTime = 0;
 unsigned long timePoint = 0;
 unsigned long timePointTwo = 0;
-String minValueAngleREAD = "100";
-String maxValueAngleREAD = "100";
+String minValueAngleREAD = "200";
+String maxValueAngleREAD = "200";
 String selectionREAD = "0";
+
+String BrakeBeginnREAD = "10:00";
+String BrakeEndREAD = "20:00";
+String summertimeREAD = "false";
+String BrakePositionREAD = "110";
 
 String summertime = "false";
 String BrakePosition = "170";
@@ -603,6 +608,10 @@ void setup()
   minValueAngle = getValue(eeprom, ',', 7);
   maxValueAngle = getValue(eeprom, ',', 8);
   selection = getValue(eeprom, ',', 9);
+  summertime = getValue(eeprom, ',', 10);
+  (getValue(eeprom, ',', 11)).toCharArray(BrakeBeginn, 6);
+  (getValue(eeprom, ',', 12)).toCharArray(BrakeEnd, 6);
+  BrakePosition = getValue(eeprom, ',', 13);
   WiFiManager wifiManager;
   wifiManager.autoConnect("Pumpe");
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
@@ -707,7 +716,7 @@ void setup()
     {
       inputMessage = request->getParam(PARAM_INPUT)->value();
       status = inputMessage;
-      String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + "H" + "E");
+      String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + ","  + "H" + "E");
       for (int i = 0; i < defaultSettings.length(); i++)
       {
         EEPROM.write(0x0F + i, defaultSettings[i]);
@@ -772,7 +781,7 @@ void setup()
           speedfiveButton = String(recievedValue);
           break;
         }
-        String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + "H" + "E");
+        String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + ","  + "H" + "E");
         for (int i = 0; i < defaultSettings.length(); i++)
         {
           EEPROM.write(0x0F + i, defaultSettings[i]);
@@ -957,14 +966,20 @@ void loop()
     minValueAngleREAD = getValue(eeprom, ',', 7);
     maxValueAngleREAD = getValue(eeprom, ',', 8);
     selectionREAD = getValue(eeprom, ',', 9);
-    if (minValueAngleREAD.toInt() != minValueAngle.toInt() || maxValueAngleREAD.toInt() != maxValueAngle.toInt() || selectionREAD.toInt() != selection.toInt())
+
+    summertimeREAD = getValue(eeprom, ',', 10);
+    BrakeBeginnREAD = getValue(eeprom, ',', 11);
+    BrakeEndREAD = getValue(eeprom, ',', 12);
+    BrakePositionREAD = getValue(eeprom, ',', 13);
+    if (minValueAngleREAD.toInt() != minValueAngle.toInt() || maxValueAngleREAD.toInt() != maxValueAngle.toInt() || selectionREAD.toInt() != selection.toInt() || String(summertimeREAD) != String(summertime) || String(BrakeBeginnREAD) != String(BrakeBeginn) || String(BrakeEndREAD) != String(BrakeEnd) || String(BrakePositionREAD) != String(BrakePosition))
     {
-      String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + "H" + "E");
+      String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + ","  + "H" + "E");
       for (int i = 0; i < defaultSettings.length(); i++)
       {
         EEPROM.write(0x0F + i, defaultSettings[i]);
       }
       EEPROM.commit();
+      Serial.println("save changes to eeprom");
     }
     timePointTwo = millis();
   }
