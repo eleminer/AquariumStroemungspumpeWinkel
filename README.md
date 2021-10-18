@@ -128,7 +128,7 @@ Ein erneuter Ping Versuch kann durch Neustart des Gerätes oder durch betätigen
 11. Mit der ESP URL verbinden und den Servo einstellen.
 12. Kaffe holen, du hast es geschafft. :)
 
-### Empfohlen, eigener NTP Server (z.B FritzBox): 
+### Empfohlen:, eigener NTP Server (z.B FritzBox): 
 
 
 Im ESP Flasher liegen zwei exportiere Binaries für den Sketch:
