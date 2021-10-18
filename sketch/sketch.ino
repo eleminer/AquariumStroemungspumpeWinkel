@@ -9,8 +9,8 @@
 #include <WiFiUdp.h>
 
 WiFiUDP ntpUDP;
-//NTPClient timeClient(ntpUDP,"fritz.box", 36000, 60000);
-NTPClient timeClient(ntpUDP,"pool.ntp.org", 36000, 60000);
+NTPClient timeClient(ntpUDP,"fritz.box", 36000, 60000);
+//NTPClient timeClient(ntpUDP,"pool.ntp.org", 36000, 60000);
 
 // nur diese Werte manuell ändern!
 const char *ssid = "Develop";
