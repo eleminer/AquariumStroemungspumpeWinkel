@@ -99,6 +99,10 @@ Wenn der Webspeicher im Gerät nicht gelöscht wird, hinterlegt der Browser gege
 
 Darauf sollte man sich jedoch nicht verlassen!
 
+### Neu:
+
+Im Hintergrund wird ein NTP Server angepingt. Falls der Zeitserver nicht erreichbar ist bzw. die Zeit nicht korrekt abgefragt werden kann, leuchtet die interne (blaue) LED vom ESP auf.
+
 ## 8. Schnellstart ESP8266
 
 1. Dieses Repository klonen (kopieren) und gegebenfalls extrahieren.
