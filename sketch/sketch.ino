@@ -843,7 +843,7 @@ void setup()
 
 void loop()
 {
-
+  
   if(ntpstatus)
   {
     if(timeClient.update()) {
@@ -855,7 +855,7 @@ void loop()
       digitalWrite(led, 0);
       errorTime++;
     }
-    if(errorTime>=15)
+    if(errorTime>=25)
     {
       Serial.println("error with ntp, shutdown the connection");
       digitalWrite(led, 0);
