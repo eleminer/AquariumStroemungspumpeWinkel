@@ -879,7 +879,7 @@ void loop()
           errorTime = 0;
           ntpstatus = 0;
           timeforSet = true;
-          timeisSet = false
+          timeisSet = false;
         }
       }
     }
