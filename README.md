@@ -80,6 +80,12 @@ Die Zeit pro Winkel pro Knopf, in Millisekunden, können über das Einstellungsm
 Werte zwischen **1ms und 9999999ms** werden vom Programm angenommen und abgespeichert.
 Diese Werte bleiben auch nach einem Stromausfall bzw. Neustart erhalten!
 
+### Neu:
+
+<img src="readmePictures/ScreenshotAndroid2.jpeg" width="300">
+
+Echtzeituhr und das Hinterlegen eines Intervalls, indem die Automatik ausgeschaltet wird.
+
 ## 6. Verkabelung
 
 Servo Datenleitung an GPIO 15. Am Wemos D1 wäre dies D8 zum Beispiel.
