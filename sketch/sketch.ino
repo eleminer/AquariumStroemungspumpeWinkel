@@ -9,8 +9,8 @@
 #include <WiFiUdp.h>
 
 WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP,"fritz.box", 36000, 60000);
-//NTPClient timeClient(ntpUDP,"pool.ntp.org", 36000, 60000);
+// NTPClient timeClient(ntpUDP,"fritz.box", 36000, 60000);
+NTPClient timeClient(ntpUDP, "pool.ntp.org", 36000, 60000);
 
 // nur diese Werte manuell ändern!
 const char *ssid = "Develop";
@@ -70,7 +70,7 @@ String BrakeBeginnREAD = "10:00";
 String BrakeEndREAD = "20:00";
 String summertimeREAD = "false";
 String BrakePositionREAD = "110";
-String automaticREAD="false";
+String automaticREAD = "false";
 
 String summertime = "false";
 String automatic = "false";
@@ -79,8 +79,8 @@ char BrakeBeginn[6] = "18:45";
 char BrakeEnd[6] = "00:05";
 char actualTimeString[9] = "44:44:44";
 int paused = 0;
-int errorTime=0;
-bool ntpstatus=1;
+int errorTime = 0;
+bool ntpstatus = 1;
 
 AsyncWebServer server(80);
 
@@ -697,7 +697,6 @@ void setup()
     }
     request->send(200, "text/plain", "OK"); });
 
-
   server.on("/startTime", HTTP_GET, [](AsyncWebServerRequest *request)
             {
     String inputMessage;
@@ -712,8 +711,7 @@ void setup()
     }
     request->send(200, "text/plain", "OK"); });
 
-
-    server.on("/endTime", HTTP_GET, [](AsyncWebServerRequest *request)
+  server.on("/endTime", HTTP_GET, [](AsyncWebServerRequest *request)
             {
     String inputMessage;
     if (request->hasParam(PARAM_INPUT))
@@ -727,8 +725,7 @@ void setup()
     }
     request->send(200, "text/plain", "OK"); });
 
-
-    server.on("/positionBrake", HTTP_GET, [](AsyncWebServerRequest *request)
+  server.on("/positionBrake", HTTP_GET, [](AsyncWebServerRequest *request)
             {
     String inputMessage;
     if (request->hasParam(PARAM_INPUT))
@@ -839,34 +836,34 @@ void setup()
     } });
   server.begin();
   timeClient.begin();
-  timeClient.update();
+  timeClient.forceUpdate();
 }
 
 void loop()
 {
   if (WiFi.status() == WL_CONNECTED)
   {
-  if(ntpstatus)
-  {
-    if(timeClient.update()) {
+    if (ntpstatus)
+    {
+      if (timeClient.update())
+      {
         digitalWrite(led, 1);
-        errorTime=0;
-    }
-    else
-    {
-      digitalWrite(led, 0);
-      errorTime++;
-    }
-    if(errorTime>=25)
-    {
-      Serial.println("error with ntp, shutdown the connection");
-      digitalWrite(led, 0);
-      errorTime=0;
-      ntpstatus=0;
+        errorTime = 0;
+      }
+      else
+      {
+        digitalWrite(led, 0);
+        errorTime++;
+      }
+      if (errorTime >= 25)
+      {
+        Serial.println("error with ntp, shutdown the connection");
+        digitalWrite(led, 0);
+        errorTime = 0;
+        ntpstatus = 0;
+      }
     }
   }
-  }
-
 
   if (summertime == "true")
   {
@@ -926,7 +923,7 @@ void loop()
     if (numberBeginnMinutes >= numberEndMinutes)
     {
       // special case
-      if ((numberActualMinutes >= numberBeginnMinutes || numberActualMinutes < numberEndMinutes) && automatic=="true")
+      if ((numberActualMinutes >= numberBeginnMinutes || numberActualMinutes < numberEndMinutes) && automatic == "true")
       {
         paused = 1;
       }
@@ -937,7 +934,7 @@ void loop()
     }
     else
     {
-      if ((numberActualMinutes >= numberBeginnMinutes && numberActualMinutes < numberEndMinutes) && automatic=="true")
+      if ((numberActualMinutes >= numberBeginnMinutes && numberActualMinutes < numberEndMinutes) && automatic == "true")
       {
         paused = 1;
       }
@@ -1046,7 +1043,7 @@ void loop()
     automaticREAD = getValue(eeprom, ',', 14);
     if (minValueAngleREAD.toInt() != minValueAngle.toInt() || maxValueAngleREAD.toInt() != maxValueAngle.toInt() || selectionREAD.toInt() != selection.toInt() || String(summertimeREAD) != String(summertime) || String(BrakeBeginnREAD) != String(BrakeBeginn) || String(BrakeEndREAD) != String(BrakeEnd) || String(BrakePositionREAD) != String(BrakePosition) || String(automaticREAD) != String(automatic))
     {
-      String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + "," + String(automatic) + ","  + "H" + "E");
+      String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + "," + String(automatic) + "," + "H" + "E");
       for (int i = 0; i < defaultSettings.length(); i++)
       {
         EEPROM.write(0x0F + i, defaultSettings[i]);
