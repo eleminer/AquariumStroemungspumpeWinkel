@@ -111,7 +111,6 @@ Die blaue LED am ESP leuchtet auf.
 Falls erfolgreich: blaue LED geht aus und Programm läuft wie gewohnt.
 Falls nicht erfolgreich: blaue LED bleibt an, die Synchronisierung wird deaktivert. !Fehlerfall, Handlungsbedarf!!!!
 
-Ein erneuter Ping Versuch kann durch Neustart des Gerätes oder durch betätigen des An/Aus Schalters auf der GUI durchgeführt werden.
 
 ## 8. Schnellstart ESP8266
 
@@ -133,9 +132,11 @@ Ein erneuter Ping Versuch kann durch Neustart des Gerätes oder durch betätigen
 
 Im ESP Flasher liegen zwei exportiere Binaries für den Sketch:
 
-    - NewSketch8266.ino.generic.bin
-    - FritzNewSketch8266.ino.generic.bin
+    - NTPPoolSketchESP8266.ino.generic.bin
+    - FritzSketchESP8266.ino.generic.bin
     
     
-Bei der Version mit "Fritz" am Anfang wird kein externer NTP Server verwendet sondern die FritzBox, falls vorhanden.
-Dafür muss der Zeitserver in der FritzBox aktiviert werden: siehe hier: [Infoseite](https://avm.de/service/wissensdatenbank/dok/FRITZ-Box-7590/336_Zeitsynchronisation-NTP-fur-FRITZ-Box-und-Netzwerkgerate-einrichten/)
+Bei der Version mit "Fritz" am Anfang wird kein externer NTP Server verwendet sondern eine FritzBox unter "fritz.box".
+Dafür muss der Zeitserver in der FritzBox aktiviert werden: siehe hier: 
+
+[Infoseite](https://avm.de/service/wissensdatenbank/dok/FRITZ-Box-7590/336_Zeitsynchronisation-NTP-fur-FRITZ-Box-und-Netzwerkgerate-einrichten/)
