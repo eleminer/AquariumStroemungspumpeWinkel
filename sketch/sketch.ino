@@ -9,7 +9,7 @@
 #include <WiFiUdp.h>
 
 WiFiUDP ntpUDP;
-//NTPClient timeClient(ntpUDP,"fritz.box", 36000, 60000);
+// NTPClient timeClient(ntpUDP,"fritz.box", 36000, 60000);
 NTPClient timeClient(ntpUDP, "pool.ntp.org", 36000, 60000);
 
 // nur diese Werte manuell ändern!
@@ -84,6 +84,10 @@ bool ntpstatus = 1;
 bool timeforSet = true;
 unsigned long timePointNTP = 0;
 bool timeisSet = false;
+String servowaiting = "false";
+String servowaitingREAD = "false";
+bool servoattached=0;
+bool overrideTimePaused=0;
 
 AsyncWebServer server(80);
 
@@ -272,10 +276,15 @@ const char index_html[] PROGMEM = R"rawliteral(
   <input type="number" id="tentacles" name="tentacles"
        min="0" max="180" step="1" value=%BRAKEPOSITION% step=1>
   </div>
-  <div class=inputfieldtext-group id=placeholderBottom>
+  <div class=inputfieldtext-group>
   <label>
   <input type="checkbox" id="automaticSwitch" onclick="checkboxAutomatic()" name="onoff">
   Zeitschaltung?</label>
+  </div>
+  <div class=inputfieldtext-group id=placeholderBottom>
+  <label>
+  <input type="checkbox" id="servooffduringwaitingSwitch" onclick="sendStatusServoWaiting()" name="onoffServo">
+  Servo Abschaltung?</label>
   </div>
     <script>
 
@@ -374,6 +383,7 @@ const char index_html[] PROGMEM = R"rawliteral(
     document.getElementById("speedbuttonfive").innerHTML = %SPEEDFIVEBUTTON%+"ms";
     document.getElementById("summer").checked = %SUMMERTIME%;
     document.getElementById("automaticSwitch").checked = %AUTOMATIC%;
+    document.getElementById("servooffduringwaitingSwitch").checked = %SERVOWAITING%;
     if (%STATUS%==1)
     {
     document.getElementById("onoff").checked = true;
@@ -507,6 +517,20 @@ const char index_html[] PROGMEM = R"rawliteral(
       xhr.send();
     }
 
+    function sendStatusServoWaiting()
+    {
+      var xhr = new XMLHttpRequest();
+      if(document.getElementById("servooffduringwaitingSwitch").checked == true)
+      {
+        xhr.open("GET", "/servowaiting?value=true", true);
+      }
+      else
+      {
+        xhr.open("GET", "/servowaiting?value=false", true);
+      }
+      xhr.send();
+    }
+
     function reqListener()
     {
       document.getElementById("actualTime").innerHTML = this.responseText;
@@ -615,6 +639,10 @@ String processor(const String &var)
   {
     return automatic;
   }
+  if (var == "SERVOWAITING")
+  {
+    return servowaiting;
+  }
 
   return String();
 }
@@ -624,6 +652,7 @@ void setup()
   pinMode(led, OUTPUT);
   digitalWrite(led, 0);
   myservo.attach(servopin);
+  servoattached=1;
   myservo.write(positionServo * factorServo);
   EEPROM.begin(512);
   Serial.begin(115200);
@@ -648,6 +677,7 @@ void setup()
   (getValue(eeprom, ',', 12)).toCharArray(BrakeEnd, 6);
   BrakePosition = getValue(eeprom, ',', 13);
   automatic = getValue(eeprom, ',', 14);
+  servowaiting = getValue(eeprom, ',', 15);
   WiFiManager wifiManager;
   wifiManager.autoConnect("Pumpe");
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
@@ -679,6 +709,20 @@ void setup()
     {
       inputMessage = request->getParam(PARAM_INPUT)->value();
       summertime = inputMessage;
+    }
+    else
+    {
+      inputMessage = "No message sent";
+    }
+    request->send(200, "text/plain", "OK"); });
+
+  server.on("/servowaiting", HTTP_GET, [](AsyncWebServerRequest *request)
+            {
+    String inputMessage;
+    if (request->hasParam(PARAM_INPUT))
+    {
+      inputMessage = request->getParam(PARAM_INPUT)->value();
+      servowaiting = inputMessage;
     }
     else
     {
@@ -763,7 +807,7 @@ void setup()
     {
       inputMessage = request->getParam(PARAM_INPUT)->value();
       status = inputMessage;
-      String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + "," + String(automatic) + ","  + "H" + "E");
+      String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + "," + String(automatic) + "," + String(servowaiting) + "," + "H" + "E");
       for (int i = 0; i < defaultSettings.length(); i++)
       {
         EEPROM.write(0x0F + i, defaultSettings[i]);
@@ -828,8 +872,8 @@ void setup()
           speedfiveButton = String(recievedValue);
           break;
         }
-        String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + "," + String(automatic) + ","  + "H" + "E");
-        for (int i = 0; i < defaultSettings.length(); i++)
+          String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + "," + String(automatic) + "," + String(servowaiting) + "," + "H" + "E");
+          for (int i = 0; i < defaultSettings.length(); i++)
         {
           EEPROM.write(0x0F + i, defaultSettings[i]);
         }
@@ -992,6 +1036,16 @@ void loop()
           direction = 1;
         }
       }
+      if (positionServo == BrakePosition.toInt() && servowaiting=="true" && servoattached)
+      {
+        overrideTimePaused=1;
+        myservo.detach();
+        servoattached=0;
+      }
+    }
+    if(paused==0 || servowaiting=="false")
+    {
+      overrideTimePaused=0;
     }
 
     if (status == "1" && factorServo == 1 && paused == 0)
@@ -1061,9 +1115,10 @@ void loop()
     BrakeEndREAD = getValue(eeprom, ',', 12);
     BrakePositionREAD = getValue(eeprom, ',', 13);
     automaticREAD = getValue(eeprom, ',', 14);
-    if (minValueAngleREAD.toInt() != minValueAngle.toInt() || maxValueAngleREAD.toInt() != maxValueAngle.toInt() || selectionREAD.toInt() != selection.toInt() || String(summertimeREAD) != String(summertime) || String(BrakeBeginnREAD) != String(BrakeBeginn) || String(BrakeEndREAD) != String(BrakeEnd) || String(BrakePositionREAD) != String(BrakePosition) || String(automaticREAD) != String(automatic))
+    servowaitingREAD = getValue(eeprom, ',', 15);
+    if (minValueAngleREAD.toInt() != minValueAngle.toInt() || maxValueAngleREAD.toInt() != maxValueAngle.toInt() || selectionREAD.toInt() != selection.toInt() || String(summertimeREAD) != String(summertime) || String(BrakeBeginnREAD) != String(BrakeBeginn) || String(BrakeEndREAD) != String(BrakeEnd) || String(BrakePositionREAD) != String(BrakePosition) || String(automaticREAD) != String(automatic) || String(servowaiting) != String(servowaitingREAD))
     {
-      String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + "," + String(automatic) + "," + "H" + "E");
+      String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + "," + String(automatic) + "," + String(servowaiting) + "," + "H" + "E");
       for (int i = 0; i < defaultSettings.length(); i++)
       {
         EEPROM.write(0x0F + i, defaultSettings[i]);
@@ -1072,5 +1127,20 @@ void loop()
       Serial.println("save changes to eeprom");
     }
     timePointTwo = millis();
+  }
+  if(status=="0" && servoattached && servowaiting=="true")
+  {
+    myservo.detach();
+    servoattached=0;
+  }
+  if(status=="0" && !servoattached && servowaiting=="false")
+  {
+    myservo.attach(servopin);
+    servoattached=1;
+  }
+  if(status=="1" && !servoattached && !overrideTimePaused)
+  {
+    myservo.attach(servopin);
+    servoattached=1;
   }
 }
