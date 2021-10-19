@@ -81,6 +81,9 @@ char actualTimeString[9] = "44:44:44";
 int paused = 0;
 int errorTime = 0;
 bool ntpstatus = 1;
+bool timeforSet = true;
+unsigned long timePointNTP = 0;
+bool timeisSet = false;
 
 AsyncWebServer server(80);
 
@@ -760,7 +763,6 @@ void setup()
     {
       inputMessage = request->getParam(PARAM_INPUT)->value();
       status = inputMessage;
-      ntpstatus=1;
       String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + "," + String(automatic) + ","  + "H" + "E");
       for (int i = 0; i < defaultSettings.length(); i++)
       {
@@ -836,31 +838,49 @@ void setup()
     } });
   server.begin();
   timeClient.begin();
-  timeClient.forceUpdate();
 }
 
 void loop()
 {
-  if (WiFi.status() == WL_CONNECTED)
+  if (millis() <= 5000 && !timeisSet)
   {
-    if (ntpstatus)
+    timeforSet = true;
+  }
+  if (millis() >= 4294667295)
+  {
+    timeisSet = false;
+  }
+
+  if ((unsigned long)millis() - timePointNTP > 5000)
+  {
+    timePointNTP = millis();
+    if (WiFi.status() == WL_CONNECTED && timeforSet)
     {
-      if (timeClient.update())
+      if (ntpstatus)
       {
-        digitalWrite(led, 1);
-        errorTime = 0;
-      }
-      else
-      {
-        digitalWrite(led, 0);
-        errorTime++;
-      }
-      if (errorTime >= 25)
-      {
-        Serial.println("error with ntp, shutdown the connection");
-        digitalWrite(led, 0);
-        errorTime = 0;
-        ntpstatus = 0;
+        if (timeClient.forceUpdate())
+        {
+          digitalWrite(led, 1);
+          errorTime = 0;
+          timeforSet = false;
+          timeisSet = true;
+        }
+        else
+        {
+          digitalWrite(led, 0);
+          errorTime++;
+          timeforSet = true;
+          timeisSet = false;
+        }
+        if (errorTime >= 25)
+        {
+          Serial.println("error with ntp, shutdown the connection");
+          digitalWrite(led, 0);
+          errorTime = 0;
+          ntpstatus = 0;
+          timeforSet = true;
+          timeisSet = false
+        }
       }
     }
   }
