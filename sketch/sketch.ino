@@ -578,8 +578,11 @@ const char index_html[] PROGMEM = R"rawliteral(
     var startTime = document.getElementById("userInputBeginn");
     startTime.addEventListener("input", function() {
     var xhr = new XMLHttpRequest();
+    if((!userInputBeginn.value==""))
+    {
     xhr.open("GET", "/startTime?value="+String(userInputBeginn.value), true);
     xhr.send();
+    }
     }, true);
 
     var endTime = document.getElementById("userInputEnd");
