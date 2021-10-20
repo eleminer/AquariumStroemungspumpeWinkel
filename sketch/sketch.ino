@@ -362,16 +362,36 @@ const char index_html[] PROGMEM = R"rawliteral(
     {
     var value = document.getElementById("minSlider").value;
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", "/sliderMIN?value="+value, true);
-    xhr.send();
+    if(Math.sign(value)==1 || Math.sign(value)==+0)
+    {
+      if(Math.abs(Math.round(value))<=180)
+      {
+        xhr.open("GET", "/sliderMIN?value="+Math.abs(Math.round(value)), true);
+        xhr.send();
+      }
+    }
+    else
+    {
+      console.log("invalid input");
+    }
     }
 
     function setMax()
     {
     var value = document.getElementById("maxSlider").value;
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", "/sliderMAX?value="+value, true);
-    xhr.send();
+    if(Math.sign(value)==1 || Math.sign(value)==+0)
+    {
+      if(Math.abs(Math.round(value))<=180)
+      {
+        xhr.open("GET", "/sliderMAX?value="+Math.abs(Math.round(value)), true);
+        xhr.send();
+      }
+    }
+    else
+    {
+      console.log("invalid input");
+    }
     }
 
     function update()
@@ -572,9 +592,20 @@ const char index_html[] PROGMEM = R"rawliteral(
     var postionBrake = document.getElementById("tentacles");
     postionBrake.addEventListener("input", function() {
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", "/positionBrake?value="+String(tentacles.value), true);
-    xhr.send();
+    if((tentacles.value)>=0 && (tentacles.value)<=180)
+    {
+      if(Math.abs(Math.round(tentacles.value))<=180)
+      {
+        xhr.open("GET", "/positionBrake?value="+String(Math.abs(Math.round(tentacles.value))), true);
+        xhr.send(); 
+      }
+    }
+    else
+    {
+      console.log("invalid input");
+    }
     }, true);
+
 
     
     </script>
