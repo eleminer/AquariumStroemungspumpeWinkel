@@ -588,7 +588,7 @@ const char index_html[] PROGMEM = R"rawliteral(
     var endTime = document.getElementById("userInputEnd");
     endTime.addEventListener("input", function() {
     var xhr = new XMLHttpRequest();
-    if((!userInputBeginn.value==""))
+    if((!userInputEnd.value==""))
     {
     xhr.open("GET", "/endTime?value="+String(userInputEnd.value), true);
     xhr.send();
