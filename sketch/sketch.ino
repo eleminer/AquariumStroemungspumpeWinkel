@@ -100,6 +100,9 @@ const char index_html[] PROGMEM = R"rawliteral(
         #angle-min, #angle-max {
             color: #2196F3;
         }
+        #tentacles {
+          size=5
+        }
         .switch {
             position: relative;
             display: inline-block;
@@ -271,12 +274,12 @@ const char index_html[] PROGMEM = R"rawliteral(
   <p>Pause bis:</p>
   <input id=userInputEnd type="time" value=%BRAKEEND% name="TimeResume">
   </div>
-  <div class=inputfieldtext-group>
+  <div class=inputfieldtext-group id=placeholderBottom>
   <p>An der Position:</p>
   <input type="number" id="tentacles" name="tentacles"
        min="0" max="180" step="1" value=%BRAKEPOSITION% step=1>
   </div>
-  <div class=inputfieldtext-group>
+  <div class=inputfieldtext-group id=placeholderBottom>
   <label>
   <input type="checkbox" id="automaticSwitch" onclick="checkboxAutomatic()" name="onoff">
   Zeitschaltung?</label>
