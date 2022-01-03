@@ -1096,10 +1096,19 @@ void loop()
     if (direction)
     {
       stepper.moveTo(calculationFaktor * maxValueAngle.toInt());
+      if(ads.readADC_SingleEnded(2)>=magnetLimit)
+      {
+        direction=0;
+      }
+
     }
     else
     {
       stepper.moveTo(calculationFaktor * minValueAngle.toInt());
+      if(ads.readADC_SingleEnded(1)>=magnetLimit)
+      {
+        direction=1;
+      }
     }
   }
   //-------------------------------------turn off, if park is reached and power off is active-----------------------------
