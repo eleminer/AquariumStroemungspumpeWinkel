@@ -1,3 +1,5 @@
+#include <Wire.h>
+#include <Adafruit_ADS1X15.h>
 #include <ESP8266WiFi.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
@@ -13,7 +15,7 @@
 #define enablepin 13 // D7
 #define motorInterfaceType 1
 AccelStepper stepper = AccelStepper(motorInterfaceType, stepPin, dirPin);
-
+Adafruit_ADS1115 ads;
 WiFiUDP ntpUDP;
 // NTPClient timeClient(ntpUDP,"fritz.box", 36000, 60000);
 NTPClient timeClient(ntpUDP, "pool.ntp.org", 36000, 60000);
@@ -23,6 +25,9 @@ const char *ssid = "Develop";
 const char *password = "384783478";
 int factorServo = 1; // 2, wenn 360°Servo. 1, wenn 180°Servo
 int servopin = 15;
+bool logic_enable = 0; // Logik für den Aktivierungspin am Treiber //wenn 1, dann 3,3 Volt wenn Stepper aktiviert.
+int magnetLimit=300;
+float calculationFaktor=10;
 // nur diese Werte manuell ändern!
 
 String getValue(String data, char separator, int index)
@@ -45,7 +50,6 @@ String getValue(String data, char separator, int index)
 }
 
 const int led = 2;
-Servo myservo;
 int addr = 0;
 char eeprom[1000] = "";
 char *pointer = eeprom;
@@ -92,8 +96,10 @@ unsigned long timePointNTP = 0;
 bool timeisSet = false;
 String servowaiting = "false";
 String servowaitingREAD = "false";
-bool servoattached=0;
-bool overrideTimePaused=0;
+bool servoattached = 0;
+bool stepperPositionSet = 0;
+unsigned long stepRange = 0;
+bool rangeSet = 0;
 
 AsyncWebServer server(80);
 
@@ -695,11 +701,30 @@ String processor(const String &var)
 
 void setup()
 {
+  ads.setGain(GAIN_ONE);
+  ads.begin();
   pinMode(led, OUTPUT);
+  pinMode(enablepin, OUTPUT);
   digitalWrite(led, 0);
-  myservo.attach(servopin);
-  servoattached=1;
-  myservo.write(positionServo * factorServo);
+  if (logic_enable)
+  {
+    digitalWrite(enablepin, 1);
+  }
+  else
+  {
+    digitalWrite(enablepin, 0);
+  }
+
+  servoattached = 1;
+
+  stepperPositionSet = 0;
+  stepper.setCurrentPosition(0);
+  stepper.moveTo(0);
+
+  stepper.setMaxSpeed(100000);
+  stepper.setSpeed(10000);
+  stepper.setAcceleration(20000);
+
   EEPROM.begin(512);
   Serial.begin(115200);
   int i = 0;
@@ -1028,120 +1053,105 @@ void loop()
   default:
     break;
   }
-  if ((unsigned long)currentTime - timePoint > speed)
+  if (numberBeginnMinutes >= numberEndMinutes)
   {
-    if (numberBeginnMinutes >= numberEndMinutes)
+    // special case
+    if ((numberActualMinutes >= numberBeginnMinutes || numberActualMinutes < numberEndMinutes) && automatic == "true")
     {
-      // special case
-      if ((numberActualMinutes >= numberBeginnMinutes || numberActualMinutes < numberEndMinutes) && automatic == "true")
-      {
-        paused = 1;
-      }
-      else
-      {
-        paused = 0;
-      }
+      paused = 1;
     }
     else
     {
-      if ((numberActualMinutes >= numberBeginnMinutes && numberActualMinutes < numberEndMinutes) && automatic == "true")
-      {
-        paused = 1;
-      }
-      else
-      {
-        paused = 0;
-      }
+      paused = 0;
     }
-
-    if (paused == 1 && status == "1")
-    {
-      if (positionServo > BrakePosition.toInt())
-      {
-        positionServo--;
-        myservo.write(positionServo);
-        if ((positionServo) >= (maxValueAngle.toInt()))
-        {
-          direction = 0;
-        }
-        if ((positionServo) <= (minValueAngle.toInt()))
-        {
-          direction = 1;
-        }
-      }
-      if (positionServo < BrakePosition.toInt())
-      {
-        positionServo++;
-        myservo.write(positionServo);
-        if ((positionServo) >= (maxValueAngle.toInt()))
-        {
-          direction = 0;
-        }
-        if ((positionServo) <= (minValueAngle.toInt()))
-        {
-          direction = 1;
-        }
-      }
-      if (positionServo == BrakePosition.toInt() && servowaiting=="true" && servoattached)
-      {
-        overrideTimePaused=1;
-        myservo.detach();
-        servoattached=0;
-      }
-    }
-    if(paused==0 || servowaiting=="false")
-    {
-      overrideTimePaused=0;
-    }
-
-    if (status == "1" && factorServo == 1 && paused == 0)
-    {
-      if (direction == 1)
-      {
-        positionServo++;
-      }
-      else
-      {
-        positionServo--;
-      }
-      myservo.write(positionServo);
-      if ((positionServo) >= (maxValueAngle.toInt()))
-      {
-        direction = 0;
-      }
-      if ((positionServo) <= (minValueAngle.toInt()))
-      {
-        direction = 1;
-      }
-    }
-
-    if (status == "1" && factorServo == 2 && paused == 0)
-    {
-      if (direction == 1)
-      {
-        positionServo++;
-      }
-      else
-      {
-        positionServo--;
-      }
-      myservo.write(positionServo);
-      int difference = maxValueAngle.toInt() - minValueAngle.toInt();
-      int midpoint = minValueAngle.toInt() + (difference / 2);
-
-      int maxNEW = (midpoint * 2) + (difference);
-      int minNEW = (midpoint * 2) - (difference);
-      if ((positionServo) >= (maxNEW))
-      {
-        direction = 0;
-      }
-      if ((positionServo) <= (minNEW))
-      {
-        direction = 1;
-      }
-    }
-    timePoint = millis();
   }
+  else
+  {
+    if ((numberActualMinutes >= numberBeginnMinutes && numberActualMinutes < numberEndMinutes) && automatic == "true")
+    {
+      paused = 1;
+    }
+    else
+    {
+      paused = 0;
+    }
+  }
+  //------------------------
+  if (paused == 1 && status == "1" && stepperPositionSet && rangeSet)
+  {
+    stepper.moveTo(calculationFaktor*BrakePosition.toInt());
+  } // setting Brake Position
+
+  //------------normal operation-----------
+  if (status == "1" && paused == 0 && stepperPositionSet && rangeSet)
+  {
+    if ((stepper.currentPosition()) >= (calculationFaktor * maxValueAngle.toInt()))
+    {
+      direction = 0;
+    }
+    if ((stepper.currentPosition()) <= (calculationFaktor * minValueAngle.toInt()))
+    {
+      direction = 1;
+    }
+    if (direction)
+    {
+      stepper.moveTo(calculationFaktor * maxValueAngle.toInt());
+    }
+    else
+    {
+      stepper.moveTo(calculationFaktor * minValueAngle.toInt());
+    }
+  }
+  //-------------------------------------turn off, if park is reached and power off is active-----------------------------
+  if((stepper.currentPosition()==calculationFaktor*BrakePosition.toInt()) && paused == 1 && servowaiting=="true" && status=="1")
+  {
+    if (logic_enable){digitalWrite(enablepin, 0);}else{digitalWrite(enablepin, 1);} //turn off
+    servoattached=0;
+  }
+  //-------------------------------------
+  if(!servoattached && (servowaiting=="false" || paused == 0) && status=="1")
+  {
+    if (logic_enable){digitalWrite(enablepin, 1);}else{digitalWrite(enablepin, 0);} //turn on
+    servoattached=1;
+    stepperPositionSet=0;
+  }
+  //-------------------------------
+  if(status=="0")
+  {
+    if (logic_enable){digitalWrite(enablepin, 0);}else{digitalWrite(enablepin, 1);} //turn off
+    servoattached=0;
+  }
+  //------------------------------------
+   if(!stepperPositionSet && servoattached)
+  {
+    stepper.move(-900000);
+
+    if(ads.readADC_SingleEnded(1)>=magnetLimit)
+    {
+      stepperPositionSet=1;
+      stepper.setCurrentPosition(0);
+      stepper.moveTo(0);
+      Serial.println("zero Position SET");
+    }
+  }
+
+  if(stepperPositionSet && !rangeSet)
+  {
+    stepper.move(900000);
+    if(ads.readADC_SingleEnded(2)>=magnetLimit)
+   {
+     stepRange=stepper.currentPosition();
+     rangeSet=1;
+     Serial.println("Rang SET");
+     calculationFaktor=stepRange/180;
+    }
+  }
+
+  Serial.println(String(stepper.currentPosition()));
+  stepper.setSpeed((1000/speed)*calculationFaktor);
+  stepper.runSpeedToPosition();
+
+  //---------------------eeprom stuff--------
   if ((unsigned long)currentTime - timePointTwo > intervalEEPROMcheck)
   {
     int i = 0;
@@ -1173,20 +1183,5 @@ void loop()
       Serial.println("save changes to eeprom");
     }
     timePointTwo = millis();
-  }
-  if(status=="0" && servoattached && servowaiting=="true")
-  {
-    myservo.detach();
-    servoattached=0;
-  }
-  if(status=="0" && !servoattached && servowaiting=="false")
-  {
-    myservo.attach(servopin);
-    servoattached=1;
-  }
-  if(status=="1" && !servoattached && !overrideTimePaused)
-  {
-    myservo.attach(servopin);
-    servoattached=1;
   }
 }
