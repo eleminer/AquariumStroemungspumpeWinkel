@@ -1,5 +1,5 @@
-//#include <Wire.h>
-//#include <Adafruit_ADS1X15.h>
+#include <Wire.h>
+#include <Adafruit_ADS1X15.h>
 #include <ESP8266WiFi.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
@@ -14,7 +14,7 @@
 #define stepPin 12   // D6
 #define enablepin 13 // D7
 #define motorInterfaceType 1
-//Adafruit_ADS1115 ads;
+Adafruit_ADS1115 ads;
 AccelStepper stepper = AccelStepper(motorInterfaceType, stepPin, dirPin);
 
 WiFiUDP ntpUDP;
@@ -101,8 +101,8 @@ bool servoattached = 0;
 bool overrideTimePaused = 0;
 bool stepperPositionSet = 0;
 bool rangeSet=0;
-int sensornumber180=0;
-int stepRange=0;
+unsigned long stepRange=0;
+float factorPosition=0;
 
 AsyncWebServer server(80);
 
@@ -704,8 +704,8 @@ String processor(const String &var)
 
 void setup()
 {
-  //ads.setGain(GAIN_ONE);
-  //ads.begin();
+  ads.setGain(GAIN_ONE);
+  ads.begin();
 
   pinMode(led, OUTPUT);
   pinMode(enablepin, OUTPUT);
@@ -1131,35 +1131,31 @@ void loop()
   //------------------------------------
   if(!stepperPositionSet && servoattached)
   {
-      stepper.moveTo(-9999999999); //big number
-  //  if(ads.readADC_SingleEnded(2)>=magnetLimit || ads.readADC_SingleEnded(1)>=magnetLimit)
-  //  {
-  //    if(ads.readADC_SingleEnded(2)>=magnetLimit)
-  //    {
-  //      sensornumber180=1;
-  //    }
-  //    if(ads.readADC_SingleEnded(1)>=magnetLimit)
-  //    {
-  //      sensornumber180=2;
-  //    }
-      //stepper.setCurrentPosition(0);
+    stepper.move(-900000);
+
+    if(ads.readADC_SingleEnded(1)>=magnetLimit)
+    {
       stepperPositionSet=1;
+      stepper.setCurrentPosition(0);
+      stepper.moveTo(0);
       Serial.println("zero Position SET");
-  //  }
+    }
   }
+
   if(stepperPositionSet && !rangeSet)
   {
-    stepper.moveTo(9999999999); //big number
-  //  if(ads.readADC_SingleEnded(sensornumber180)>=magnetLimit)
-  //  {
-  //    stepRange=stepper.currentPosition();
-      rangeSet=1;
+    stepper.move(900000);
+    if(ads.readADC_SingleEnded(2)>=magnetLimit)
+   {
+     stepRange=stepper.currentPosition();
+     rangeSet=1;
      Serial.println("Rang SET");
     }
-  //}
-  stepper.setSpeed(10000);
-  stepper.runSpeedToPosition();
-  //Serial.println(String(ads.readADC_SingleEnded(1))+"und"+ String(ads.readADC_SingleEnded(2)));
+  }
+
+      stepper.setSpeed(10000);
+      stepper.runSpeedToPosition();
+      Serial.println(String(stepper.currentPosition()));
 
   //---------------------eeprom stuff--------
   if ((unsigned long)currentTime - timePointTwo > intervalEEPROMcheck)
