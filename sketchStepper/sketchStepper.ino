@@ -26,7 +26,7 @@ const char *ssid = "Develop";
 const char *password = "384783478";
 bool logic_enable = 0; // Logik für den Aktivierungspin am Treiber //wenn 1, dann 3,3 Volt wenn Stepper aktiviert.
 int magnetLimit=14000; //Threshold für die Hall Sensoren. Werte über/gleich diesem Wert werden als Signal interpretiert.
-float calculationFaktor=10; //Faktor mit dem die Schritte multipliziert werden, wird nach dem Ausmessen neu gesetzt.
+float calculationFaktor=10; //Faktor mit dem die Schritte multipliziert werden, wird nach dem Ausmessen neu gesetzt. 10 ist ein guter Startwert für 1/16 bei 400Steps/Rev.
 // nur diese Werte manuell ändern!
 
 String getValue(String data, char separator, int index)
