@@ -25,7 +25,7 @@ NTPClient timeClient(ntpUDP, "pool.ntp.org", 36000, 60000);
 const char *ssid = "Develop";
 const char *password = "384783478";
 bool logic_enable = 0; // Logik für den Aktivierungspin am Treiber //wenn 1, dann 3,3 Volt wenn Stepper aktiviert.
-int magnetLimit=300; //Threshold für die Hall Sensoren. Werte über/gleich diesem Wert werden als Signal interpretiert.
+int magnetLimit=14000; //Threshold für die Hall Sensoren. Werte über/gleich diesem Wert werden als Signal interpretiert.
 float calculationFaktor=10; //Faktor mit dem die Schritte multipliziert werden, wird nach dem Ausmessen neu gesetzt.
 // nur diese Werte manuell ändern!
 
@@ -99,6 +99,8 @@ bool servoattached = 0;
 bool stepperPositionSet = 0;
 unsigned long stepRange = 0;
 bool rangeSet = 0;
+bool alreadySET_error_compensationLEFT=0;
+bool alreadySET_error_compensationRIGHT=0;
 
 AsyncWebServer server(80);
 
@@ -1085,16 +1087,32 @@ void loop()
     {
       if(ads.readADC_SingleEnded(1)>=magnetLimit)
       {
+        if(!alreadySET_error_compensationLEFT)
+        {
         stepper.setCurrentPosition(0);
         stepper.moveTo(0);
+        alreadySET_error_compensationLEFT=1;
+        }
+      }
+      else
+      {
+        alreadySET_error_compensationLEFT=0;
       }
     }
     else
     {
       if(ads.readADC_SingleEnded(2)>=magnetLimit)
       {
+        if(!alreadySET_error_compensationRIGHT)
+        {
         stepper.setCurrentPosition(rangeSet);
-        stepper.moveTo(rangeSety);
+        stepper.moveTo(rangeSet);
+        alreadySET_error_compensationRIGHT=1;
+        }
+      }
+      else
+      {
+        alreadySET_error_compensationRIGHT=0;
       }
 
     }
