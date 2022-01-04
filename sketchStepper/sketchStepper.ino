@@ -10,6 +10,7 @@
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 #include <AccelStepper.h>
+//--------Pins für Stepper Motor--------
 #define dirPin 14    // D5
 #define stepPin 12   // D6
 #define enablepin 13 // D7
@@ -23,11 +24,9 @@ NTPClient timeClient(ntpUDP, "pool.ntp.org", 36000, 60000);
 // nur diese Werte manuell ändern!
 const char *ssid = "Develop";
 const char *password = "384783478";
-int factorServo = 1; // 2, wenn 360°Servo. 1, wenn 180°Servo
-int servopin = 15;
 bool logic_enable = 0; // Logik für den Aktivierungspin am Treiber //wenn 1, dann 3,3 Volt wenn Stepper aktiviert.
-int magnetLimit=300;
-float calculationFaktor=10;
+int magnetLimit=300; //Threshold für die Hall Sensoren. Werte über/gleich diesem Wert werden als Signal interpretiert.
+float calculationFaktor=10; //Faktor mit dem die Schritte multipliziert werden, wird nach dem Ausmessen neu gesetzt.
 // nur diese Werte manuell ändern!
 
 String getValue(String data, char separator, int index)
@@ -703,7 +702,9 @@ void setup()
 {
   ads.setGain(GAIN_ONE);
   ads.begin();
+
   pinMode(led, OUTPUT);
+
   pinMode(enablepin, OUTPUT);
   digitalWrite(led, 0);
   if (logic_enable)
@@ -1076,10 +1077,28 @@ void loop()
       paused = 0;
     }
   }
-  //------------------------
+  //--------------------------------------------------------------
   if (paused == 1 && status == "1" && stepperPositionSet && rangeSet)
   {
     stepper.moveTo(calculationFaktor*BrakePosition.toInt());
+    if((stepper.currentPosition())>=BrakePosition.toInt())
+    {
+      if(ads.readADC_SingleEnded(1)>=magnetLimit)
+      {
+        stepper.setCurrentPosition(0);
+        stepper.moveTo(0);
+      }
+    }
+    else
+    {
+      if(ads.readADC_SingleEnded(2)>=magnetLimit)
+      {
+        stepper.setCurrentPosition(rangeSet);
+        stepper.moveTo(rangeSety);
+      }
+
+    }
+
   } // setting Brake Position
 
   //------------normal operation-----------
@@ -1093,6 +1112,7 @@ void loop()
     {
       direction = 1;
     }
+
     if (direction)
     {
       stepper.moveTo(calculationFaktor * maxValueAngle.toInt());
@@ -1134,7 +1154,6 @@ void loop()
    if(!stepperPositionSet && servoattached)
   {
     stepper.move(-900000);
-
     if(ads.readADC_SingleEnded(1)>=magnetLimit)
     {
       stepperPositionSet=1;
@@ -1148,15 +1167,14 @@ void loop()
   {
     stepper.move(900000);
     if(ads.readADC_SingleEnded(2)>=magnetLimit)
-   {
-     stepRange=stepper.currentPosition();
-     rangeSet=1;
-     Serial.println("Rang SET");
-     calculationFaktor=stepRange/180;
+    {
+      stepRange=stepper.currentPosition();
+      rangeSet=1;
+      Serial.println("Rang SET");
+      calculationFaktor=stepRange/180;
     }
   }
 
-  Serial.println(String(stepper.currentPosition()));
   stepper.setSpeed((1000/speed)*calculationFaktor);
   stepper.runSpeedToPosition();
 
