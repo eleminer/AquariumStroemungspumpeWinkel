@@ -196,7 +196,7 @@ Der Schrittmotor hat vier Adern.
 Zwei davon gehören immer zusammen. Tipp: um herauszufinden welche, kann man diese temporär miteinander verbinden. (natürlich außerhalb der Schaltung!!!)
 Dreht sich der Motor fühlbar schwerer, dann hat man ein Paar gefunden welches zusammen gehört.
 
-Der Motor sollte sich beim ersten Start in die Richtung des ersten Endschalter (Nullpunkt/ A1) bewegen.
+Der Motor sollte sich beim ersten Start in die Richtung des ersten Endschalter (Nullpunkt / A1) bewegen.
 
 <img src="readmePictures/readme_stepper_skiz.png" width="900">
 
@@ -205,6 +205,7 @@ Zudem sollte Mikrostepping von 1/16 aktiviert sein, beim TMC2130 wird dies durch
 [Tutorial TMC2130](https://www.microcontrollertutorials.com/2021/07/tmc2130-stepper-motor-driver-working.html)
 
 Für den TMC2130 sieht dies dann folgendermaßen aus:
+
 SPI Jumper: geschlossen
 1. M1A,M1B,M2A,M2B --> Motor Spulenpaare
 2. GND --> Ground
@@ -240,3 +241,38 @@ Das setzen vom Fahrweg und die Berechnung der Geschwindigkeit wird nur einmal na
 Danach wird dieser Wert als Standard gesetzt und bleibt bis zu einem Stromausfall vom ESP erhalten.
 
 Das Anfahren des Nullpunktes wird jedoch nach jedem Ausschalten des Motors, durch "Programm Hauptschalter oben links" oder nach "Parkposition mit Abschaltung" durchgeführt.
+
+## Werte im Sketch
+
+Nachfolgend ein paar Variablen die im Sketch geändert werden können/sollten.
+
+```c++
+const char *ssid = "Develop";
+const char *password = "384783478";
+bool logic_enable = 0; // Logik für den Aktivierungspin am Treiber //wenn 1, dann 3,3 Volt wenn Stepper aktiviert.
+int magnetLimit=14000; //Threshold für die Hall Sensoren. Werte über/gleich diesem Wert werden als Signal interpretiert.
+float calculationFaktor=10; //Faktor mit dem die Schritte multipliziert werden, wird nach dem Ausmessen neu gesetzt. 10 ist ein guter Startwert für 1/16 bei 400Steps/Rev.
+```
+
+1. logic_enable
+
+    Setzt den Enable Pin vom Schrittmotor Treiber.
+
+2. magnetLimit
+
+    Schwellwerte für die Hallsensoren. Sollten so groß wie möglich gewählt werden.
+    Tipp: vor dem Auspielen des Sketches aus dem Testordner das Programm "sketch_hallsensor_test.ino" hochladen udn damit die Werte von den Hallsensoren prüfen.
+
+3. calculationFaktor
+
+    Faktor der ungefähr dem zu berechnendem Faktor entspricht.
+    Für 1/16 Mikrostepping ist 10 ein guter Startwert.
+
+
+## Vorgehensweise um das Update zu installieren
+1. Hardware aufbauen
+2. Libarys in Arduino Libary Ordner kopieren (wird benötigt zum eigenständigen kompilieren)
+3. Werte von Hallsensoren testen
+4. Hautprogramm hochladen (falls EEPROM noch nie geflahst wurde, dies davor durchführen, für ein "alt System" eventuell nicht notwendig.)
+5. Motor Drehrichtung prüfen
+6. gegebenfalls Motordrehrichtung anpassen.
