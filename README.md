@@ -219,6 +219,9 @@ SPI Jumper: geschlossen
 11. SDI --> open
 12. EN --> 13 bzw D7 (am ESP8266 Wemos D1)
 
+Für den DRV8825 sieht dies so ähnlich aus.
+Nur um diesen auf 1/16 step zu stellen, muss man M2 auf HIGH ziehen und M0 und M1 offen lassen (werden durch interne pull Down Widerstände auf Ground gezogen).
+
 
 
 ## Funktionsweise vom Programm
