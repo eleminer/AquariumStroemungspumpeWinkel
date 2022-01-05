@@ -196,7 +196,7 @@ Der Schrittmotor hat vier Adern.
 Zwei davon gehören immer zusammen. Tipp: um herauszufinden welche, kann man diese temporär miteinander verbinden. (natürlich außerhalb der Schaltung!!!)
 Dreht sich der Motor fühlbar schwerer, dann hat man ein Paar gefunden welches zusammen gehört.
 
-Der Motor sollte sich beim ersten Start in die Richtung des ersten Endschalter (NUllpunkt/ A1) bewegen.
+Der Motor sollte sich beim ersten Start in die Richtung des ersten Endschalter (Nullpunkt/ A1) bewegen.
 
 <img src="readmePictures/readme_stepper_skiz.png" width="900">
 
