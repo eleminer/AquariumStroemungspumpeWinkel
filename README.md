@@ -284,5 +284,12 @@ Als Board Generic ESP8266 nutzen.
 Falls dies nicht klappt, kann ich auch gerne eine kompilierte Version auf Anfrage hochladen mit euren Hallsensor Werten und calculation Faktor etc.
 
 
+###noch ein wichtiger Hinweis:
+    
+    Je mehr Schritte der Schrittmotor pro Winkel ausführen soll, desto langsamer wird schlussendlich die maximale Fahrgeschwindigkeit.
+    Das Lesen vom analog zu digital Wandler ist sehr zeitintensiv und ist hierdurch der bremsende Faktor.
+    
+    
+    
 
 Viel Spaß mit dieser Software. Bei Fragen/Wünsche/Anregungen gerne melden.
