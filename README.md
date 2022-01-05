@@ -282,3 +282,7 @@ float calculationFaktor=10; //Faktor mit dem die Schritte multipliziert werden, 
 Als Board Generic ESP8266 nutzen.
 
 Falls dies nicht klappt, kann ich auch gerne eine kompilierte Version auf Anfrage hochladen mit euren Hallsensor Werten und calculation Faktor etc.
+
+
+
+Viel Spaß mit dieser Software. Bei Fragen gerne melden.
