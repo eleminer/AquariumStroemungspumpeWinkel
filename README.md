@@ -285,4 +285,4 @@ Falls dies nicht klappt, kann ich auch gerne eine kompilierte Version auf Anfrag
 
 
 
-Viel Spaß mit dieser Software. Bei Fragen gerne melden.
+Viel Spaß mit dieser Software. Bei Fragen/Wünsche/Anregungen gerne melden.
