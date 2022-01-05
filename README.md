@@ -270,7 +270,7 @@ float calculationFaktor=10; //Faktor mit dem die Schritte multipliziert werden, 
     Für 1/16 Mikrostepping ist 10 ein guter Startwert.
 
 
-## Vorgehensweise um das Update zu installieren
+## Vorgehensweise für diese Version
 1. Hardware aufbauen
 2. Libarys in Arduino Libary Ordner kopieren (wird benötigt zum eigenständigen kompilieren)
 3. Werte von Hallsensoren testen (mit sketch_hallsensor_test.ino)
