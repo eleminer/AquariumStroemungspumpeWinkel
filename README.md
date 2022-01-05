@@ -221,6 +221,8 @@ SPI Jumper: geschlossen
 
 Für den DRV8825 sieht dies so ähnlich aus.
 Nur um diesen auf 1/16 step zu stellen, muss man M2 auf HIGH ziehen und M0 und M1 offen lassen (werden durch interne pull Down Widerstände auf Ground gezogen).
+genaue Beschaltung ist auf dieser Webseite gut dargestellt:
+[Tutorial DVR8825](https://starthardware.org/stepper-motor-mit-dem-drv8825-steuern/)
 
 
 
