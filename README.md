@@ -230,6 +230,7 @@ genaue Beschaltung ist auf dieser Webseite gut dargestellt:
 ## Funktionsweise vom Programm
 
 (Alle Drehrichtung beziehen sich auf den Motor der auf dem Tisch steht mit Drehachse nach oben gerichtet.)
+
 Der Motor dreht sich beim Einschalten mit dem Uhrzeigersinn und sucht den Nullpunkt. (Hallsensor A1 am AD Wandler). Wenn dieser gefunden wurde, setzt das Programm dort seinen Nullpunkt.
 Dann wird der andere Hallsensor angefahren, damit wird das Maximum gesetzt.
 
