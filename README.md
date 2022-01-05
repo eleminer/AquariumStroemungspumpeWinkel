@@ -202,6 +202,22 @@ Falls die Drehrichtung nicht stimmt, kann man die Motor Kabel umdrehen.
 Zudem sollte MIkrostepping von 1/16 aktiviert sein, beim TMC2130 wird dies durch offen lassen der Konfigurationspins gesetzt.
 [Tutorial TMC2130](https://www.microcontrollertutorials.com/2021/07/tmc2130-stepper-motor-driver-working.html)
 
+Für den TMC2130 sieht dies dann folgendermaßen aus:
+SPI Jumper: geschlossen
+1. M1A,M1B,M2A,M2B --> Motor Spulenpaare
+2. GND --> Ground
+3. VM --> Motor Versorgungsspannung (ich nutze 12Volt)
+4. VIO --> 3,3Volt
+5. DIR --> 14 bzw. D5 (am ESP8266 Wemos D1)
+6. STEP --> 12 bzw. D6 (am ESP8266 Wemos D1)
+7. con -.-> open
+8. SDO --> open
+9. CS --> Ground
+10. SCK --> open
+11. SDI --> open
+12. EN --> 13 bzw D7 (am ESP8266 Wemos D1)
+
+
 
 ## Funktionsweise vom Programm
 
