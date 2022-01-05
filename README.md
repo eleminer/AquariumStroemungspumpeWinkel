@@ -263,7 +263,7 @@ float calculationFaktor=10; //Faktor mit dem die Schritte multipliziert werden, 
 2. magnetLimit
 
     Schwellwerte für die Hallsensoren. Sollten so groß wie möglich gewählt werden.
-    Tipp: vor dem Auspielen des Sketches aus dem Testordner das Programm "sketch_hallsensor_test.ino" hochladen udn damit die Werte von den Hallsensoren prüfen.
+    Tipp: vor dem Auspielen des "Hauptprogrammes" aus dem Testordner das Programm "sketch_hallsensor_test.ino" hochladen und damit die Werte von den Hallsensoren prüfen.
 
 3. calculationFaktor
 
