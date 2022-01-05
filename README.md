@@ -222,7 +222,8 @@ SPI Jumper: geschlossen
 
 Für den DRV8825 unterscheidet sich die Pinbelegung nur minimal.
 Um den Chip auf 1/16 step zu stellen, muss man M2 auf HIGH ziehen und M0 und M1 offen lassen (werden durch interne pull Down Widerstände auf Ground gezogen).
-genaue Beschaltung ist auf dieser Webseite gut dargestellt und sollte unbedingt berücksichtigt werden, falls die Pins anders heißen als beim hier aufgeführten TMC2130!!!:
+
+Genaue Beschaltung ist auf dieser Webseite gut dargestellt und sollte unbedingt berücksichtigt werden, falls die Pins anders heißen als beim hier aufgeführten TMC2130!!!:
 [Tutorial DVR8825](https://starthardware.org/stepper-motor-mit-dem-drv8825-steuern/)
 
 
