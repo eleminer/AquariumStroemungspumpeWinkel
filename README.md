@@ -198,8 +198,10 @@ Dreht sich der Motor fühlbar schwerer, dann hat man ein Paar gefunden welches z
 
 Der Motor sollte sich beim ersten Start in die Richtung des ersten Endschalter (NUllpunkt/ A1) bewegen.
 
+<img src="readmePictures/readme_stepper_skiz.png" width="900">
+
 Falls die Drehrichtung nicht stimmt, kann man die Motor Kabel umdrehen.
-Zudem sollte MIkrostepping von 1/16 aktiviert sein, beim TMC2130 wird dies durch offen lassen der Konfigurationspins gesetzt.
+Zudem sollte Mikrostepping von 1/16 aktiviert sein, beim TMC2130 wird dies durch offen lassen der Konfigurationspins gesetzt.
 [Tutorial TMC2130](https://www.microcontrollertutorials.com/2021/07/tmc2130-stepper-motor-driver-working.html)
 
 Für den TMC2130 sieht dies dann folgendermaßen aus:
