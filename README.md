@@ -193,7 +193,7 @@ Mit Schrift sichbar nach vorne auf dem Tisch liegend...
 Verkablung Schrittmotor:
 
 Der Schrittmotor hat vier Adern.
-Zwei davon gehören immer zusammen. Tipp: um herauszufinden welche, kann man diese temporär miteinander verbinden. (natürlich außerhalb der Schaltung!!!)
+Zwei davon gehören immer zusammen. Tipp: um herauszufinden welche kann man diese temporär miteinander verbinden. (natürlich außerhalb der Schaltung!!!)
 Dreht sich der Motor fühlbar schwerer, dann hat man ein Paar gefunden welches zusammen gehört.
 
 Der Motor sollte sich beim ersten Start in die Richtung des ersten Endschalter (Nullpunkt / A1) bewegen.
@@ -220,7 +220,7 @@ SPI Jumper: geschlossen
 11. SDI --> open
 12. EN --> 13 bzw D7 (am ESP8266 Wemos D1)
 
-Für den DRV8825 sieht dies so ähnlich aus.
+Für den DRV8825 ist dies so ähnlich der Fall.
 Nur um diesen auf 1/16 step zu stellen, muss man M2 auf HIGH ziehen und M0 und M1 offen lassen (werden durch interne pull Down Widerstände auf Ground gezogen).
 genaue Beschaltung ist auf dieser Webseite gut dargestellt:
 [Tutorial DVR8825](https://starthardware.org/stepper-motor-mit-dem-drv8825-steuern/)
@@ -276,3 +276,7 @@ float calculationFaktor=10; //Faktor mit dem die Schritte multipliziert werden, 
 4. Hautprogramm hochladen (falls EEPROM noch nie geflahst wurde, dies davor durchführen, für ein "alt System" eventuell nicht notwendig.)
 5. Motor Drehrichtung prüfen
 6. gegebenfalls Motordrehrichtung anpassen.
+
+Als Board Generic ESP8266 nutzen.
+
+Falls dies nicht klappt, kann ich auch gerne eine kompilierte Version auf Anfrage hochladen mit euren Hallsensor Werten und calculation Faktor etc.
