@@ -196,9 +196,17 @@ Der Schrittmotor hat vier Adern.
 Zwei davon gehören immer zusammen. Tipp: um herauszufinden welche, kann man diese temporär miteinander verbinden. (natürlich außerhalb der Schaltung!!!)
 Dreht sich der Motor fühlbar schwerer, dann hat man ein Paar gefunden welches zusammen gehört.
 
+Der Motor sollte sich beim ersten Start in die Richtung des ersten Endschalter (NUllpunkt/ A1) bewegen.
+
+Falls die Drehrichtung nicht stimmt, kann man die Motor Kabel umdrehen.
+Zudem sollte MIkrostepping von 1/16 aktiviert sein, beim TMC2130 wird dies durch offen lassen der Konfigurationspins gesetzt.
+[Tutorial TMC2130](https://www.microcontrollertutorials.com/2021/07/tmc2130-stepper-motor-driver-working.html)
+
 
 ## Funktionsweise vom Programm
-Der Motor dreht sich beim Einschalten mit dem Uhrzeigersinn (wenn der Motor auf dem Tisch steht mit Achse nach oben) und sucht den Nullpunkt. (Hallsensor A1 am AD Wandler). Wenn dieser gefunden wurde, setzt das Programm dort seinen Nullpunkt.
+
+(Alle Drehrichtung beziehen sich auf den Motor der auf dem Tisch steht mit Drehachse nach oben gerichtet.)
+Der Motor dreht sich beim Einschalten mit dem Uhrzeigersinn und sucht den Nullpunkt. (Hallsensor A1 am AD Wandler). Wenn dieser gefunden wurde, setzt das Programm dort seinen Nullpunkt.
 Dann wird der andere Hallsensor angefahren, damit wird das Maximum gesetzt.
 
 Aus dieser Information wird zudem die Geschwindigkeit berechnet, die ab diesem Zeitpunkt vom Programm benutzt wird.
@@ -206,7 +214,6 @@ Während diesem ganzem Vorgang liegt dem Programm nur ein Schätzwert vor. 10 is
 Dadurch stimmt während diesem Vorgang logischerweise die in der GUI gesetzte Geschwindigkeit noch nicht mit dem Motor überein.
 
 Das setzen vom Fahrweg und die Berechnung der Geschwindigkeit wird nur einmal nach Neustart vom ESP durchgeführt.
-Danach wird dieser Wert als Standard gesetzt.
+Danach wird dieser Wert als Standard gesetzt und bleibt bis zu einem Stromausfall vom ESP erhalten.
 
 Das Anfahren des Nullpunktes wird jedoch nach jedem Ausschalten des Motors, durch "Programm Hauptschalter oben links" oder nach "Parkposition mit Abschaltung" durchgeführt.
-
