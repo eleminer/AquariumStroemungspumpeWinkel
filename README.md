@@ -204,7 +204,7 @@ Falls die Drehrichtung nicht stimmt, kann man die Motor Kabel umdrehen.
 Zudem sollte Mikrostepping von 1/16 aktiviert sein, beim TMC2130 wird dies durch offen lassen der Konfigurationspins gesetzt.
 [Tutorial TMC2130](https://www.microcontrollertutorials.com/2021/07/tmc2130-stepper-motor-driver-working.html)
 
-Für den TMC2130 sieht dies dann folgendermaßen aus:
+Für den TMC2130 sieht das dann folgendermaßen aus:
 
 SPI Jumper: geschlossen
 1. M1A,M1B,M2A,M2B --> Motor Spulenpaare
@@ -220,9 +220,9 @@ SPI Jumper: geschlossen
 11. SDI --> open
 12. EN --> 13 bzw D7 (am ESP8266 Wemos D1)
 
-Für den DRV8825 ist dies so ähnlich der Fall.
-Nur um diesen auf 1/16 step zu stellen, muss man M2 auf HIGH ziehen und M0 und M1 offen lassen (werden durch interne pull Down Widerstände auf Ground gezogen).
-genaue Beschaltung ist auf dieser Webseite gut dargestellt:
+Für den DRV8825 unterscheidet sich die Pinbelegung nur minimal.
+Um den Chip auf 1/16 step zu stellen, muss man M2 auf HIGH ziehen und M0 und M1 offen lassen (werden durch interne pull Down Widerstände auf Ground gezogen).
+genaue Beschaltung ist auf dieser Webseite gut dargestellt und sollte unbedingt berücksichtigt werden, falls die Pins anders heißen als beim hier aufgeführten TMC2130!!!:
 [Tutorial DVR8825](https://starthardware.org/stepper-motor-mit-dem-drv8825-steuern/)
 
 
