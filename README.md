@@ -146,3 +146,67 @@ Bei der Version mit "Fritz" am Anfang wird kein externer NTP Server verwendet so
 Dafür muss der Zeitserver in der FritzBox aktiviert werden: siehe hier: 
 
 [Infoseite](https://avm.de/service/wissensdatenbank/dok/FRITZ-Box-7590/336_Zeitsynchronisation-NTP-fur-FRITZ-Box-und-Netzwerkgerate-einrichten/)
+
+# Schrittmotor Version: 05.01.2022
+## Ein neuere Version ist nun verfügbar. :)
+### Das bisherige Problem:
+
+Der Servomotor ist ziemlich laut und man hört deutlich die einzelnen Schritte.
+
+### Lösung:
+Schrittmotor anstelle von einem Servomotor.
+
+Dieser bietet, dank Mikrostepping, eine ruhigere/flüssigere Bewegung.
+
+Aus disem Grund wurde die Software umgeschrieben um ein Schrittmotor in Kombination mit zwei Endschaltern (Hallsensoren 49E) anzusteuern.
+Das Webinterface ist dabei unverändert geblieben.
+## Verkabelung / Aufbau der Schaltung
+Die Verkabelung ist recht einfach, benötigt werden folgende Bauteile:
+ 
+1. Menge:1 Artikel: ADS1115 16-Bit ADC
+2. Menge:1 Artikel: Schrittmotor (zum Beispiel NEMA 17)
+3. Menge:2 Artikel: Hallsensoren 49E
+4. Menge:1 Artikel: Schrittmotor Treiber (zum Beispiel TMC2130)
+
+Verkabelung Analog Digital Wandler:
+
+Breakout Board abgehend zu.....
+ 1. VDD --> 3,3Volt
+ 2. GND --> Ground
+ 3. SCL --> D1 am ESP8266
+ 4. SDA --> D2 am ESP8266
+ 5. ADDR --> open
+ 6. ALRT --> open
+ 7. A0 --> open
+ 8. A1 --> Hallsensor Nullposition
+ 9. A2 --> Hallsensor Endschalter 180Grad
+10. A3 --> open
+
+Verkabelung Hallsensor 49E:
+
+Mit Schrift sichbar nach vorne auf dem Tisch liegend...
+
+1. linker Pin: 3,3Volt
+2. mittlerer Pin: Ground
+3. rechter Pin: Signal (geht zum AD Wandler)
+
+Verkablung Schrittmotor:
+
+Der Schrittmotor hat vier Adern.
+Zwei davon gehören immer zusammen. Tipp: um herauszufinden welche, kann man diese temporär miteinander verbinden. (natürlich außerhalb der Schaltung!!!)
+Dreht sich der Motor fühlbar schwerer, dann hat man ein Paar gefunden welches zusammen gehört.
+
+
+## Funktionsweise vom Programm
+Der Motor dreht sich beim Einschalten mit dem Uhrzeigersinn (wenn der Motor auf dem Tisch steht mit Achse nach oben) und sucht den Nullpunkt. (Hallsensor A1 am AD Wandler). Wenn dieser gefunden wurde, setzt das Programm dort seinen Nullpunkt.
+Dann wird der andere Hallsensor angefahren, damit wird das Maximum gesetzt.
+
+Aus dieser Information wird zudem die Geschwindigkeit berechnet, die ab diesem Zeitpunkt vom Programm benutzt wird.
+Während diesem ganzem Vorgang liegt dem Programm nur ein Schätzwert vor. 10 ist ein guter Wert für Mikrostepping mit 1/16.
+Dadurch stimmt während diesem Vorgang logischerweise die in der GUI gesetzte Geschwindigkeit noch nicht mit dem Motor überein.
+
+Das setzen vom Fahrweg und die Berechnung der Geschwindigkeit wird nur einmal nach Neustart vom ESP durchgeführt.
+Danach wird dieser Wert als Standard gesetzt.
+
+Das Anfahren des Nullpunktes wird jedoch nach jedem Ausschalten des Motors, durch "Programm Hauptschalter oben links" oder nach "Parkposition mit Abschaltung" durchgeführt.
+
