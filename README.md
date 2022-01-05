@@ -275,7 +275,7 @@ float calculationFaktor=10; //Faktor mit dem die Schritte multipliziert werden, 
 1. Hardware aufbauen
 2. Libarys in Arduino Libary Ordner kopieren (wird benötigt zum eigenständigen kompilieren)
 3. Werte von Hallsensoren testen (mit sketch_hallsensor_test.ino)
-4. Hautprogramm hochladen (falls EEPROM noch nie geflahst wurde dies davor durchführen, für ein "Altsystem" eventuell nicht notwendig.)
+4. Hautprogramm hochladen (falls EEPROM noch nie geflasht wurde dies davor durchführen, für ein "Altsystem" eventuell nicht notwendig.)
 5. Motor Drehrichtung prüfen
 6. gegebenfalls Motordrehrichtung anpassen. Durch Tauschen der Adern.
 
