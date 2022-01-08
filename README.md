@@ -193,10 +193,10 @@ Mit Schrift sichbar nach vorne auf dem Tisch liegend...
 Verkablung Schrittmotor:
 
 Der Schrittmotor hat vier Adern.
-Zwei davon gehören immer zusammen. Tipp: um herauszufinden welche, kann man diese temporär miteinander verbinden. (natürlich außerhalb der Schaltung!!!)
+Zwei davon gehören immer zusammen. Tipp: um herauszufinden welche kann man diese temporär miteinander verbinden. (natürlich außerhalb der Schaltung!!!)
 Dreht sich der Motor fühlbar schwerer, dann hat man ein Paar gefunden welches zusammen gehört.
 
-Der Motor sollte sich beim ersten Start in die Richtung des ersten Endschalter (NUllpunkt/ A1) bewegen.
+Der Motor sollte sich beim ersten Start in die Richtung des ersten Endschalter (Nullpunkt / A1) bewegen.
 
 <img src="readmePictures/readme_stepper_skiz.png" width="900">
 
@@ -204,7 +204,8 @@ Falls die Drehrichtung nicht stimmt, kann man die Motor Kabel umdrehen.
 Zudem sollte Mikrostepping von 1/16 aktiviert sein, beim TMC2130 wird dies durch offen lassen der Konfigurationspins gesetzt.
 [Tutorial TMC2130](https://www.microcontrollertutorials.com/2021/07/tmc2130-stepper-motor-driver-working.html)
 
-Für den TMC2130 sieht dies dann folgendermaßen aus:
+Für den TMC2130 sieht das dann folgendermaßen aus:
+
 SPI Jumper: geschlossen
 1. M1A,M1B,M2A,M2B --> Motor Spulenpaare
 2. GND --> Ground
@@ -219,9 +220,10 @@ SPI Jumper: geschlossen
 11. SDI --> open
 12. EN --> 13 bzw D7 (am ESP8266 Wemos D1)
 
-Für den DRV8825 sieht dies so ähnlich aus.
-Nur um diesen auf 1/16 step zu stellen, muss man M2 auf HIGH ziehen und M0 und M1 offen lassen (werden durch interne pull Down Widerstände auf Ground gezogen).
-genaue Beschaltung ist auf dieser Webseite gut dargestellt:
+Für den DRV8825 unterscheidet sich die Pinbelegung nur minimal.
+Um den Chip auf 1/16 step zu stellen, muss man M2 auf HIGH ziehen und M0 und M1 offen lassen (werden durch interne pull Down Widerstände auf Ground gezogen).
+
+Genaue Beschaltung ist auf dieser Webseite gut dargestellt und sollte unbedingt berücksichtigt werden, falls die Pins anders heißen als beim hier aufgeführten TMC2130!!!:
 [Tutorial DVR8825](https://starthardware.org/stepper-motor-mit-dem-drv8825-steuern/)
 
 
@@ -229,6 +231,7 @@ genaue Beschaltung ist auf dieser Webseite gut dargestellt:
 ## Funktionsweise vom Programm
 
 (Alle Drehrichtung beziehen sich auf den Motor der auf dem Tisch steht mit Drehachse nach oben gerichtet.)
+
 Der Motor dreht sich beim Einschalten mit dem Uhrzeigersinn und sucht den Nullpunkt. (Hallsensor A1 am AD Wandler). Wenn dieser gefunden wurde, setzt das Programm dort seinen Nullpunkt.
 Dann wird der andere Hallsensor angefahren, damit wird das Maximum gesetzt.
 
@@ -240,3 +243,53 @@ Das setzen vom Fahrweg und die Berechnung der Geschwindigkeit wird nur einmal na
 Danach wird dieser Wert als Standard gesetzt und bleibt bis zu einem Stromausfall vom ESP erhalten.
 
 Das Anfahren des Nullpunktes wird jedoch nach jedem Ausschalten des Motors, durch "Programm Hauptschalter oben links" oder nach "Parkposition mit Abschaltung" durchgeführt.
+
+## Werte im Sketch
+
+Nachfolgend ein paar Variablen die im Sketch geändert werden können/sollten.
+
+```c++
+const char *ssid = "Develop";
+const char *password = "384783478";
+bool logic_enable = 0; // Logik für den Aktivierungspin am Treiber //wenn 1, dann 3,3 Volt wenn Stepper aktiviert.
+int magnetLimit=14000; //Threshold für die Hall Sensoren. Werte über/gleich diesem Wert werden als Signal interpretiert.
+float calculationFaktor=10; //Faktor mit dem die Schritte multipliziert werden, wird nach dem Ausmessen neu gesetzt. 10 ist ein guter Startwert für 1/16 bei 400Steps/Rev.
+```
+
+1. logic_enable
+
+    Setzt den Enable Pin vom Schrittmotor Treiber.
+
+2. magnetLimit
+
+    Schwellwerte für die Hallsensoren. Sollten so groß wie möglich gewählt werden.
+    Tipp: vor dem Auspielen des "Hauptprogrammes" aus dem Testordner das Programm "sketch_hallsensor_test.ino" hochladen und damit die Werte von den Hallsensoren prüfen.
+
+3. calculationFaktor
+
+    Faktor der ungefähr dem zu berechnendem Faktor entspricht.
+    Für 1/16 Mikrostepping ist 10 ein guter Startwert.
+
+
+## Vorgehensweise für diese Version
+1. Hardware aufbauen
+2. Libarys in Arduino Libary Ordner kopieren (wird benötigt zum eigenständigen kompilieren)
+3. Werte von Hallsensoren testen (mit sketch_hallsensor_test.ino)
+4. Hautprogramm hochladen (falls EEPROM noch nie geflasht wurde dies davor durchführen, für ein "Altsystem" eventuell nicht notwendig.)
+5. Motor Drehrichtung prüfen
+6. gegebenfalls Motordrehrichtung anpassen. Durch Tauschen der Adern.
+
+Als Board Generic ESP8266 nutzen.
+
+Falls dies nicht klappt, kann ich auch gerne eine kompilierte Version auf Anfrage hochladen mit euren Hallsensor Werten und calculation Faktor etc.
+
+
+### noch ein wichtiger Hinweis:
+    
+    Je mehr Schritte der Schrittmotor pro Winkel ausführen soll, desto langsamer wird schlussendlich die maximale Fahrgeschwindigkeit.
+    Das Lesen vom analog zu digital Wandler ist sehr zeitintensiv und ist hierdurch der bremsende Faktor.
+    
+    
+    
+
+Viel Spaß mit dieser Software. Bei Fragen/Wünsche/Anregungen gerne melden.
