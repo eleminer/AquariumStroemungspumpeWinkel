@@ -1,32 +1,3 @@
-Skip to content
-Search or jump to…
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@eleminer 
-eleminer
-/
-AquariumStroemungspumpeWinkel
-Public
-Code
-Issues
-Pull requests
-Actions
-Projects
-Wiki
-Security
-Insights
-Settings
-AquariumStroemungspumpeWinkel/sketchStepper/sketchStepper.ino
-
-Marc added comment
-Latest commit d0fac9e 4 days ago
- History
- 0 contributors
-1232 lines (1163 sloc)  35 KB
-   
 #include <Wire.h>
 #include <Adafruit_ADS1X15.h>
 #include <ESP8266WiFi.h>
@@ -54,7 +25,7 @@ NTPClient timeClient(ntpUDP, "pool.ntp.org", 36000, 60000);
 const char *ssid = "Develop";
 const char *password = "384783478";
 bool logic_enable = 0; // Logik für den Aktivierungspin am Treiber //wenn 1, dann 3,3 Volt wenn Stepper aktiviert.
-int magnetLimit=14000; //Threshold für die Hall Sensoren. Werte über/gleich diesem Wert werden als Signal interpretiert.
+String magnetLimit="14000"; //Threshold für die Hall Sensoren. Werte über/gleich diesem Wert werden als Signal interpretiert.
 float calculationFaktor=10; //Faktor mit dem die Schritte multipliziert werden, wird nach dem Ausmessen neu gesetzt. 10 ist ein guter Startwert für 1/16 bei 400Steps/Rev.
 // nur diese Werte manuell ändern!
 
@@ -103,6 +74,7 @@ unsigned long timePointTwo = 0;
 String minValueAngleREAD = "200";
 String maxValueAngleREAD = "200";
 String selectionREAD = "0";
+String magnetLimitREAD="0";
 
 String BrakeBeginnREAD = "10:00";
 String BrakeEndREAD = "20:00";
@@ -143,7 +115,7 @@ const char index_html[] PROGMEM = R"rawliteral(
             color: #2196F3;
         }
         #tentacles {
-          size=5
+          size=5;
         }
         .switch {
             position: relative;
@@ -328,8 +300,16 @@ const char index_html[] PROGMEM = R"rawliteral(
   <div class=inputfieldtext-group id=placeholderBottom>
   <label>
   <input type="checkbox" id="servooffduringwaitingSwitch" onclick="sendStatusServoWaiting()" name="onoffServo">
-  Servo Abschaltung?</label>
+  Stepper Abschaltung?</label>
   </div>
+
+  <div class=inputfieldtext-group id=placeholderBottom>
+  <p>Hallsensoren-Schwelle:</p>
+  <input type="number" id="hallinput" name="hallinput" step="1" value=%HALLSENSOREN% step=1 style="width: 5em;">
+  </div>
+  
+
+
     <script>
     function buttonchange(buttonnumber)
     {
@@ -636,6 +616,13 @@ const char index_html[] PROGMEM = R"rawliteral(
       console.log("invalid input");
     }
     }, true);
+
+    var Hallsensoren = document.getElementById("hallinput.value");
+    Hallsensoren.addEventListener("input", function() {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/hallsensor?value="+String(hallinput.value), true);
+    xhr.send(); 
+    }, true);
     
     </script>
 </body>
@@ -703,6 +690,10 @@ String processor(const String &var)
   {
     return servowaiting;
   }
+  if (var == "HALLSENSOREN")
+  {
+    return magnetLimit;
+  }
 
   return String();
 }
@@ -759,6 +750,7 @@ void setup()
   BrakePosition = getValue(eeprom, ',', 13);
   automatic = getValue(eeprom, ',', 14);
   servowaiting = getValue(eeprom, ',', 15);
+  magnetLimit = getValue(eeprom, ',', 16);
   WiFiManager wifiManager;
   wifiManager.autoConnect("Pumpe");
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
@@ -839,6 +831,20 @@ void setup()
     }
     request->send(200, "text/plain", "OK"); });
 
+  server.on("/hallsensor", HTTP_GET, [](AsyncWebServerRequest *request)
+            {
+    String inputMessage;
+    if (request->hasParam(PARAM_INPUT))
+    {
+      inputMessage = request->getParam(PARAM_INPUT)->value();
+      magnetLimit = inputMessage;
+    }
+    else
+    {
+      inputMessage = "No message sent";
+    }
+    request->send(200, "text/plain", "OK"); });
+
   server.on("/endTime", HTTP_GET, [](AsyncWebServerRequest *request)
             {
     String inputMessage;
@@ -888,7 +894,7 @@ void setup()
     {
       inputMessage = request->getParam(PARAM_INPUT)->value();
       status = inputMessage;
-      String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + "," + String(automatic) + "," + String(servowaiting) + "," + "H" + "E");
+      String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + "," + String(automatic) + "," + String(servowaiting) + "," + String(magnetLimit) + "," + "H" + "E");
       for (int i = 0; i < defaultSettings.length(); i++)
       {
         EEPROM.write(0x0F + i, defaultSettings[i]);
@@ -953,7 +959,7 @@ void setup()
           speedfiveButton = String(recievedValue);
           break;
         }
-          String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + "," + String(automatic) + "," + String(servowaiting) + "," + "H" + "E");
+          String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + "," + String(automatic) + "," + String(servowaiting) + "," + String(magnetLimit) + "," + "H" + "E");
           for (int i = 0; i < defaultSettings.length(); i++)
         {
           EEPROM.write(0x0F + i, defaultSettings[i]);
@@ -1224,9 +1230,10 @@ void loop()
     BrakePositionREAD = getValue(eeprom, ',', 13);
     automaticREAD = getValue(eeprom, ',', 14);
     servowaitingREAD = getValue(eeprom, ',', 15);
-    if (minValueAngleREAD.toInt() != minValueAngle.toInt() || maxValueAngleREAD.toInt() != maxValueAngle.toInt() || selectionREAD.toInt() != selection.toInt() || String(summertimeREAD) != String(summertime) || String(BrakeBeginnREAD) != String(BrakeBeginn) || String(BrakeEndREAD) != String(BrakeEnd) || String(BrakePositionREAD) != String(BrakePosition) || String(automaticREAD) != String(automatic) || String(servowaiting) != String(servowaitingREAD))
+    magnetLimitREAD = getValue(eeprom, ',', 16);
+    if (magnetLimitREAD.toInt() != magnetLimit.toInt() || minValueAngleREAD.toInt() != minValueAngle.toInt() || maxValueAngleREAD.toInt() != maxValueAngle.toInt() || selectionREAD.toInt() != selection.toInt() || String(summertimeREAD) != String(summertime) || String(BrakeBeginnREAD) != String(BrakeBeginn) || String(BrakeEndREAD) != String(BrakeEnd) || String(BrakePositionREAD) != String(BrakePosition) || String(automaticREAD) != String(automatic) || String(servowaiting) != String(servowaitingREAD))
     {
-      String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + "," + String(automatic) + "," + String(servowaiting) + "," + "H" + "E");
+      String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + "," + String(automatic) + "," + String(servowaiting) + "," + String(magnetLimit) + "," + "H" + "E");
       for (int i = 0; i < defaultSettings.length(); i++)
       {
         EEPROM.write(0x0F + i, defaultSettings[i]);
@@ -1237,16 +1244,3 @@ void loop()
     timePointTwo = millis();
   }
 }
-© 2022 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Docs
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
-Loading complete
