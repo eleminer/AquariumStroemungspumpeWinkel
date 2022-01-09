@@ -617,7 +617,7 @@ const char index_html[] PROGMEM = R"rawliteral(
     }
     }, true);
 
-    var Hallsensoren = document.getElementById("hallinput.value");
+    var Hallsensoren = document.getElementById("hallinput");
     Hallsensoren.addEventListener("input", function() {
     var xhr = new XMLHttpRequest();
     xhr.open("GET", "/hallsensor?value="+String(hallinput.value), true);
