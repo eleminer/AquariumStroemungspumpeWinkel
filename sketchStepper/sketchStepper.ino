@@ -1,3 +1,32 @@
+Skip to content
+Search or jump to…
+Pull requests
+Issues
+Marketplace
+Explore
+ 
+@eleminer 
+eleminer
+/
+AquariumStroemungspumpeWinkel
+Public
+Code
+Issues
+Pull requests
+Actions
+Projects
+Wiki
+Security
+Insights
+Settings
+AquariumStroemungspumpeWinkel/sketchStepper/sketchStepper.ino
+
+Marc added comment
+Latest commit d0fac9e 4 days ago
+ History
+ 0 contributors
+1232 lines (1163 sloc)  35 KB
+   
 #include <Wire.h>
 #include <Adafruit_ADS1X15.h>
 #include <ESP8266WiFi.h>
@@ -80,7 +109,6 @@ String BrakeEndREAD = "20:00";
 String summertimeREAD = "false";
 String BrakePositionREAD = "110";
 String automaticREAD = "false";
-String magnetLimitREAD = "0";
 
 String summertime = "false";
 String automatic = "false";
@@ -201,7 +229,6 @@ const char index_html[] PROGMEM = R"rawliteral(
             position: relative;
             margin-top: 15px;
             text-align: center;
-
         }
         #speedDIV {
             position: relative;
@@ -301,14 +328,9 @@ const char index_html[] PROGMEM = R"rawliteral(
   <div class=inputfieldtext-group id=placeholderBottom>
   <label>
   <input type="checkbox" id="servooffduringwaitingSwitch" onclick="sendStatusServoWaiting()" name="onoffServo">
-  Stepper Abschaltung?</label>
-  </div>
-  <div class=inputfieldtext-group id=placeholderBottom>
-  <p>Hallsensoren:</p>
-  <input type="number" id="hallsensoren" name="hallsensoren" step="1" value=%HALLSENSOREN% step=1>
+  Servo Abschaltung?</label>
   </div>
     <script>
-
     function buttonchange(buttonnumber)
     {
     var i=1;
@@ -334,7 +356,6 @@ const char index_html[] PROGMEM = R"rawliteral(
           (document.getElementById("speedbuttonfive")).style.backgroundColor = "red";
           break;
         }
-
       }
       else
       {
@@ -363,7 +384,6 @@ const char index_html[] PROGMEM = R"rawliteral(
     xhr.open("GET", "/button?value="+buttonnumber, true);
     xhr.send();
     }
-
     function powerbutton()
     {
     if (onoff.checked != true)
@@ -378,7 +398,6 @@ const char index_html[] PROGMEM = R"rawliteral(
     xhr.open("GET", "/power?value="+value, true);
     xhr.send();
     }
-
     function setMin()
     {
     var value = document.getElementById("minSlider").value;
@@ -396,7 +415,6 @@ const char index_html[] PROGMEM = R"rawliteral(
       console.log("invalid input");
     }
     }
-
     function setMax()
     {
     var value = document.getElementById("maxSlider").value;
@@ -414,7 +432,6 @@ const char index_html[] PROGMEM = R"rawliteral(
       console.log("invalid input");
     }
     }
-
     function update()
     {
     document.getElementById("speedbuttonone").innerHTML = %SPEEDFIRSTBUTTON%+"ms";
@@ -454,9 +471,7 @@ const char index_html[] PROGMEM = R"rawliteral(
       console.log("error");
       break;
     }
-
     }
-
     function alert()
     {
         var buttonnumber = prompt("Einstellungen Button (Nummer???)", "1");
@@ -529,7 +544,6 @@ const char index_html[] PROGMEM = R"rawliteral(
     xhr.open("GET", "/buttonValues?value="+invalue+"&buttonN="+buttonnumber, true);
     xhr.send();
     }
-
     function checkboxValueChanged()
     {
       var xhr = new XMLHttpRequest();
@@ -543,7 +557,6 @@ const char index_html[] PROGMEM = R"rawliteral(
       }
       xhr.send();
     }
-
     function checkboxAutomatic()
     {
       var xhr = new XMLHttpRequest();
@@ -557,7 +570,6 @@ const char index_html[] PROGMEM = R"rawliteral(
       }
       xhr.send();
     }
-
     function sendStatusServoWaiting()
     {
       var xhr = new XMLHttpRequest();
@@ -571,12 +583,10 @@ const char index_html[] PROGMEM = R"rawliteral(
       }
       xhr.send();
     }
-
     function reqListener()
     {
       document.getElementById("actualTime").innerHTML = this.responseText;
     }
-
     function updateClock()
     {
       var xhr = new XMLHttpRequest();
@@ -584,7 +594,6 @@ const char index_html[] PROGMEM = R"rawliteral(
       xhr.open("GET", "/timeRequestPackage", true);
       xhr.send();
     }
-
     document.addEventListener('visibilitychange', function (event) {
     if (document.hidden) {
         clearInterval(handle);
@@ -592,10 +601,7 @@ const char index_html[] PROGMEM = R"rawliteral(
         document.location.reload(true)
     }
     });
-
     var handle=setInterval(updateClock, 1000);
-
-
     var startTime = document.getElementById("userInputBeginn");
     startTime.addEventListener("input", function() {
     var xhr = new XMLHttpRequest();
@@ -605,7 +611,6 @@ const char index_html[] PROGMEM = R"rawliteral(
     xhr.send();
     }
     }, true);
-
     var endTime = document.getElementById("userInputEnd");
     endTime.addEventListener("input", function() {
     var xhr = new XMLHttpRequest();
@@ -615,7 +620,6 @@ const char index_html[] PROGMEM = R"rawliteral(
     xhr.send();
     }
     }, true);
-
     var postionBrake = document.getElementById("tentacles");
     postionBrake.addEventListener("input", function() {
     var xhr = new XMLHttpRequest();
@@ -632,15 +636,6 @@ const char index_html[] PROGMEM = R"rawliteral(
       console.log("invalid input");
     }
     }, true);
-
-
-    var Hallsensoren = document.getElementById("hallsensoren");
-    hallsensoren.addEventListener("input", function() {
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", "/hallsensoren?value="+String(Math.abs(Math.round(Hallsensoren.value))), true);
-    xhr.send(); 
-    }, true);
-
     
     </script>
 </body>
@@ -692,12 +687,6 @@ String processor(const String &var)
   {
     return BrakePosition;
   }
-
-  if (var == "HALLSENSOREN")
-  {
-    return magnetLimit;
-  }
-
   if (var == "BRAKEBEGINN")
   {
     return BrakeBeginn;
@@ -770,7 +759,6 @@ void setup()
   BrakePosition = getValue(eeprom, ',', 13);
   automatic = getValue(eeprom, ',', 14);
   servowaiting = getValue(eeprom, ',', 15);
-  magnetLimit = getValue(eeprom, ',', 16 );
   WiFiManager wifiManager;
   wifiManager.autoConnect("Pumpe");
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
@@ -900,7 +888,7 @@ void setup()
     {
       inputMessage = request->getParam(PARAM_INPUT)->value();
       status = inputMessage;
-      String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + "," + String(automatic) + "," + String(servowaiting)+ "," + String(magnetLimit) + "," + "H" + "E");
+      String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + "," + String(automatic) + "," + String(servowaiting) + "," + "H" + "E");
       for (int i = 0; i < defaultSettings.length(); i++)
       {
         EEPROM.write(0x0F + i, defaultSettings[i]);
@@ -912,22 +900,6 @@ void setup()
       inputMessage = "No message sent";
     }
     request->send(200, "text/plain", "OK"); });
-
-  //----------stepper-----new-----------
-    server.on("/hallsensoren", HTTP_GET, [](AsyncWebServerRequest *request)
-            {
-    String inputMessage;
-    if (request->hasParam(PARAM_INPUT))
-    {
-      inputMessage = request->getParam(PARAM_INPUT)->value();
-      magnetLimit = inputMessage;
-    }
-    else
-    {
-      inputMessage = "No message sent";
-    }
-    request->send(200, "text/plain", "OK"); });
-  //----------stepper-----new-----------
 
   server.on("/button", HTTP_GET, [](AsyncWebServerRequest *request)
             {
@@ -981,7 +953,7 @@ void setup()
           speedfiveButton = String(recievedValue);
           break;
         }
-          String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + "," + String(automatic) + "," + String(servowaiting)+ "," + String(magnetLimit) + "," + "H" + "E");
+          String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + "," + String(automatic) + "," + String(servowaiting) + "," + "H" + "E");
           for (int i = 0; i < defaultSettings.length(); i++)
         {
           EEPROM.write(0x0F + i, defaultSettings[i]);
@@ -1252,10 +1224,9 @@ void loop()
     BrakePositionREAD = getValue(eeprom, ',', 13);
     automaticREAD = getValue(eeprom, ',', 14);
     servowaitingREAD = getValue(eeprom, ',', 15);
-    magnetLimitREAD = getValue(eeprom, ',', 16);
-    if (magnetLimitREAD.toInt() != magnetLimit) || minValueAngleREAD.toInt() != minValueAngle.toInt() || maxValueAngleREAD.toInt() != maxValueAngle.toInt() || selectionREAD.toInt() != selection.toInt() || String(summertimeREAD) != String(summertime) || String(BrakeBeginnREAD) != String(BrakeBeginn) || String(BrakeEndREAD) != String(BrakeEnd) || String(BrakePositionREAD) != String(BrakePosition) || String(automaticREAD) != String(automatic) || String(servowaiting) != String(servowaitingREAD))
+    if (minValueAngleREAD.toInt() != minValueAngle.toInt() || maxValueAngleREAD.toInt() != maxValueAngle.toInt() || selectionREAD.toInt() != selection.toInt() || String(summertimeREAD) != String(summertime) || String(BrakeBeginnREAD) != String(BrakeBeginn) || String(BrakeEndREAD) != String(BrakeEnd) || String(BrakePositionREAD) != String(BrakePosition) || String(automaticREAD) != String(automatic) || String(servowaiting) != String(servowaitingREAD))
     {
-      String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + "," + String(automatic) + "," + String(servowaiting)+ "," + String(magnetLimit) + "," + "H" + "E");
+      String defaultSettings = String("," + String(speedfirstButton) + "," + String(speedsecondButton) + "," + String(speedthirdButton) + "," + String(speedfourButton) + "," + String(speedfiveButton) + "," + String(status) + "," + String(minValueAngle) + "," + String(maxValueAngle) + "," + String(selection) + "," + String(summertime) + "," + String(BrakeBeginn) + "," + String(BrakeEnd) + "," + String(BrakePosition) + "," + String(automatic) + "," + String(servowaiting) + "," + "H" + "E");
       for (int i = 0; i < defaultSettings.length(); i++)
       {
         EEPROM.write(0x0F + i, defaultSettings[i]);
@@ -1266,3 +1237,16 @@ void loop()
     timePointTwo = millis();
   }
 }
+© 2022 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Docs
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
+Loading complete
