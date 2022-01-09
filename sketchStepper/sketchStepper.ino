@@ -1185,7 +1185,7 @@ void loop()
    if(!stepperPositionSet && servoattached)
   {
     stepper.move(-900000);
-    if(ads.readADC_SingleEnded(1)>=magnetLimit)
+    if(ads.readADC_SingleEnded(1)>=magnetLimit.toInt())
     {
       stepperPositionSet=1;
       stepper.setCurrentPosition(0);
@@ -1197,7 +1197,7 @@ void loop()
   if(stepperPositionSet && !rangeSet)
   {
     stepper.move(900000);
-    if(ads.readADC_SingleEnded(2)>=magnetLimit)
+    if(ads.readADC_SingleEnded(2)>=magnetLimit.toInt())
     {
       stepRange=stepper.currentPosition();
       rangeSet=1;
