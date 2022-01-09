@@ -1098,7 +1098,7 @@ void loop()
     stepper.moveTo(calculationFaktor*BrakePosition.toInt());
     if((stepper.currentPosition())>=BrakePosition.toInt())
     {
-      if(ads.readADC_SingleEnded(1)>=magnetLimit)
+      if(ads.readADC_SingleEnded(1)>=magnetLimit.toInt())
       {
         if(!alreadySET_error_compensationLEFT)
         {
@@ -1114,7 +1114,7 @@ void loop()
     }
     else
     {
-      if(ads.readADC_SingleEnded(2)>=magnetLimit)
+      if(ads.readADC_SingleEnded(2)>=magnetLimit.toInt())
       {
         if(!alreadySET_error_compensationRIGHT)
         {
@@ -1147,7 +1147,7 @@ void loop()
     if (direction)
     {
       stepper.moveTo(calculationFaktor * maxValueAngle.toInt());
-      if(ads.readADC_SingleEnded(2)>=magnetLimit)
+      if(ads.readADC_SingleEnded(2)>=magnetLimit.toInt())
       {
         direction=0;
       }
@@ -1156,7 +1156,7 @@ void loop()
     else
     {
       stepper.moveTo(calculationFaktor * minValueAngle.toInt());
-      if(ads.readADC_SingleEnded(1)>=magnetLimit)
+      if(ads.readADC_SingleEnded(1)>=magnetLimit.toInt())
       {
         direction=1;
       }
