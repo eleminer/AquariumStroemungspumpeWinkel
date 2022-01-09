@@ -621,7 +621,8 @@ const char index_html[] PROGMEM = R"rawliteral(
     Hallsensoren.addEventListener("input", function() {
     var xhr = new XMLHttpRequest();
     xhr.open("GET", "/hallsensor?value="+String(hallinput.value), true);
-    xhr.send(); 
+    xhr.send();
+    document.getElementById("onoff").checked = false; 
     }, true);
     
     </script>
@@ -838,6 +839,9 @@ void setup()
     {
       inputMessage = request->getParam(PARAM_INPUT)->value();
       magnetLimit = inputMessage;
+      status="0";
+      rangeSet=0;
+      stepperPositionSet=0;
     }
     else
     {
