@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        #angle-min, #angle-max {
+            color: #2196F3;
+        }
+        #tentacles {
+          size=5;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        input:focus + .slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+        input:checked + .slider:before {
+            -webkit-transform: translateX(26px);
+            -ms-transform: translateX(26px);
+            transform: translateX(26px);
+        }
+        .slider.round {
+            border-radius: 34px;
+        }
+        .slider.round:before {
+            border-radius: 50px;
+        }
+        #onoffdiv {
+            margin-top: 6px;
+            margin-left: 6px;
+        }
+        .button {
+            background-color: #2196F3; /* Green */
+            border: none;
+            color: white;
+            padding: 0.4%;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 20px;
+            width: 140px;
+            transform: scale(1);
+            margin-bottom: 10px;
+        }
+        .button-group {
+            position: relative;
+            margin-top: 10px;
+            margin-bottom: 0px;
+            text-align: center;
+        }
+        .inputfieldtext-group {
+            color: #2196F3;
+            position: relative;
+            margin-top: 10px;
+            margin-bottom: 0px;
+            text-align: center;
+        }
+        #summertimeDIV {
+            position: relative;
+            margin-top: 15px;
+            text-align: center;
+        }
+        #speedDIV {
+            position: relative;
+            margin-top: 100px;
+            text-align: center;
+        }
+        #actualTime {
+            color: #2196F3;
+        }
+        #timerDIV {
+            position: relative;
+            margin-top: 20px;
+            text-align: center;
+        }
+        #settingbutton {
+            position: relative;
+            text-align: center;
+        }
+        #setting {
+            background-color: Transparent;
+            border:none;
+        }
+        .valuesButtons {
+            margin-top: 0%;
+            font-size: 15px;
+        }
+        #placeholderBottom {
+          padding-bottom: 20px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+</head>
+<body onload="update()">
+    <div data-role="page">
+        <div data-role="header">
+            <h1>Pumpe Winkel</h1>
+        </div>
+        <div data-role="main" class="ui-content">
+            <div data-role="rangeslider">
+                <label for="price-min">Winkel:</label>
+                <input type="range" onchange="setMin()" id="minSlider" name="angle-min" id="angle-min" value="%MINVALUEANGLE%" min="0" max="180">
+                <label for="angle-max">Winkel:</label>
+                <input type="range" onchange="setMax()" id="maxSlider" name="angle-max" id="angle-max" value="%MAXVALUEANGLE%"  min="0" max="180">
+            </div>
+        </div>
+    </div>
+    <div id="onoffdiv">
+    <label class="switch">
+        <input onclick="powerbutton()" id="onoff" type="checkbox">
+        <span class="slider round"></span>
+    </label>
+    </div>
+    <div id=speedDIV>
+        <p>Geschwindigkeit:</p>
+    </div>
+    <div class=button-group>
+    <button onclick="buttonchange(1)" class="button">1<h2 id="speedbuttonone" class="valuesButtons">%One%</h2></button>
+    <button onclick="buttonchange(2)" class="button">2<h2 id="speedbuttontwo" class="valuesButtons">%Two%</h2></button>
+    <button onclick="buttonchange(3)" class="button">3<h2  id="speedbuttonthree" class="valuesButtons">%Three%</h2></button>
+    <button onclick="buttonchange(4)" class="button">4<h2 id="speedbuttonfour" class="valuesButtons">%Four%</h2></button>
+    <button onclick="buttonchange(5)" class="button">5<h2 id="speedbuttonfive" class="valuesButtons">%Five%</h2></button>
+    </div>
+    <div id="settingbutton">
+    <button id="setting" onclick="alert()"><img src="https://raw.githubusercontent.com/eleminer/AquariumStroemungspumpeWinkel/master/settingPicture.png"height="20%" width="20%"></button> 
+    </div>
+    <div id=timerDIV>
+        <p>Uhrzeit und Zeitschaltung:</p>
+    </div>
+    <div class=button-group>
+    <time id=actualTime>00:00:00</time>
+    </div>
+    <div id=summertimeDIV>
+  <label>
+  <input type="checkbox" id="summer" onclick="checkboxValueChanged()" name="summer">
+  Sommerzeit?</label>
+  </div>
+  <div class=inputfieldtext-group>
+  <p>Pause von:</p>
+  <input id=userInputBeginn type="time" value=%BRAKEBEGINN% name="TimeStop">
+  </div>
+  <div class=inputfieldtext-group>
+  <p>Pause bis:</p>
+  <input id=userInputEnd type="time" value=%BRAKEEND% name="TimeResume">
+  </div>
+  <div class=inputfieldtext-group id=placeholderBottom>
+  <p>An der Position:</p>
+  <input type="number" id="tentacles" name="tentacles"
+       min="0" max="180" step="1" value=%BRAKEPOSITION% step=1>
+  </div>
+  <div class=inputfieldtext-group id=placeholderBottom>
+  <label>
+  <input type="checkbox" id="automaticSwitch" onclick="checkboxAutomatic()" name="onoff">
+  Zeitschaltung?</label>
+  </div>
+  <div class=inputfieldtext-group id=placeholderBottom>
+  <label>
+  <input type="checkbox" id="servooffduringwaitingSwitch" onclick="sendStatusServoWaiting()" name="onoffServo">
+  Stepper Abschaltung?</label>
+  </div>
+
+  <div class=inputfieldtext-group id=placeholderBottom>
+  <p>Hallsensoren-Schwelle:</p>
+  <input type="number" id="hallinput" name="hallinput" step="1" value=%HALLSENSOREN% step=1 style="width: 5em;">
+  </div>
+  
+
+
+    <script>
+    function buttonchange(buttonnumber)
+    {
+    var i=1;
+    while (i<=5)
+    {
+      if(i==buttonnumber)
+      {
+        switch (i)
+        {
+          case 1:
+          (document.getElementById("speedbuttonone")).style.backgroundColor = "red";
+          break;
+          case 2:
+          (document.getElementById("speedbuttontwo")).style.backgroundColor = "red";
+          break;
+          case 3:
+          (document.getElementById("speedbuttonthree")).style.backgroundColor = "red";
+          break;
+          case 4:
+          (document.getElementById("speedbuttonfour")).style.backgroundColor = "red";
+          break;
+          case 5:
+          (document.getElementById("speedbuttonfive")).style.backgroundColor = "red";
+          break;
+        }
+      }
+      else
+      {
+        switch (i)
+        {
+          case 1:
+          (document.getElementById("speedbuttonone")).style.backgroundColor = "#2196F3";
+          break;
+          case 2:
+          (document.getElementById("speedbuttontwo")).style.backgroundColor = "#2196F3";
+          break;
+          case 3:
+          (document.getElementById("speedbuttonthree")).style.backgroundColor = "#2196F3";
+          break;
+          case 4:
+          (document.getElementById("speedbuttonfour")).style.backgroundColor = "#2196F3";
+          break;
+          case 5:
+          (document.getElementById("speedbuttonfive")).style.backgroundColor = "#2196F3";
+          break;
+        }
+      }
+      i++;
+    }
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/button?value="+buttonnumber, true);
+    xhr.send();
+    }
+    function powerbutton()
+    {
+    if (onoff.checked != true)
+    {
+    var value = 0;
+    }
+    else
+    {
+    var value = 1;
+    }
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/power?value="+value, true);
+    xhr.send();
+    }
+    function setMin()
+    {
+    var value = document.getElementById("minSlider").value;
+    var xhr = new XMLHttpRequest();
+    if(Math.sign(value)==1 || Math.sign(value)==+0)
+    {
+      if(Math.abs(Math.round(value))<=180)
+      {
+        xhr.open("GET", "/sliderMIN?value="+Math.abs(Math.round(value)), true);
+        xhr.send();
+      }
+    }
+    else
+    {
+      console.log("invalid input");
+    }
+    }
+    function setMax()
+    {
+    var value = document.getElementById("maxSlider").value;
+    var xhr = new XMLHttpRequest();
+    if(Math.sign(value)==1 || Math.sign(value)==+0)
+    {
+      if(Math.abs(Math.round(value))<=180)
+      {
+        xhr.open("GET", "/sliderMAX?value="+Math.abs(Math.round(value)), true);
+        xhr.send();
+      }
+    }
+    else
+    {
+      console.log("invalid input");
+    }
+    }
+    function update()
+    {
+    document.getElementById("speedbuttonone").innerHTML = %SPEEDFIRSTBUTTON%+"ms";
+    document.getElementById("speedbuttontwo").innerHTML = %SPEEDSECONDBUTTON%+"ms";
+    document.getElementById("speedbuttonthree").innerHTML = %SPEEDTHIRDBUTTON%+"ms";
+    document.getElementById("speedbuttonfour").innerHTML = %SPEEDFOURBUTTON%+"ms";
+    document.getElementById("speedbuttonfive").innerHTML = %SPEEDFIVEBUTTON%+"ms";
+    document.getElementById("summer").checked = %SUMMERTIME%;
+    document.getElementById("automaticSwitch").checked = %AUTOMATIC%;
+    document.getElementById("servooffduringwaitingSwitch").checked = %SERVOWAITING%;
+    if (%STATUS%==1)
+    {
+    document.getElementById("onoff").checked = true;
+    }
+    else
+    {
+    document.getElementById("onoff").checked = false;
+    }
+    switch (%SELECTION%)
+    {
+      case 1:
+      (document.getElementById("speedbuttonone")).style.backgroundColor = "red";
+      break;
+      case 2:
+      (document.getElementById("speedbuttontwo")).style.backgroundColor = "red";
+      break;
+      case 3:
+      (document.getElementById("speedbuttonthree")).style.backgroundColor = "red";
+      break;
+      case 4:
+      (document.getElementById("speedbuttonfour")).style.backgroundColor = "red";
+      break;
+      case 5:
+      (document.getElementById("speedbuttonfive")).style.backgroundColor = "red";
+      break;
+      default:
+      console.log("error");
+      break;
+    }
+    }
+    function alert()
+    {
+        var buttonnumber = prompt("Einstellungen Button (Nummer???)", "1");
+        switch (buttonnumber)
+        {
+            case "1":
+            var temp=prompt("Millisekunden von 1:", "50");
+            var letters = /^[0-9]+$/;
+            if(temp.match(letters))
+            {
+            document.getElementById("speedbuttonone").innerHTML = temp+"ms";
+            var invalue=temp;
+            }else
+            {
+                alert('invalid input');
+            }
+            break;
+            case "2":
+            var temp=prompt("Millisekunden von 2:", "50");
+            var letters = /^[0-9]+$/;
+            if(temp.match(letters))
+            {
+            document.getElementById("speedbuttontwo").innerHTML = temp+"ms";
+            var invalue=temp;
+            }else
+            {
+                alert('invalid input');
+            }
+            break;
+            case "3":
+            var temp=prompt("Millisekunden von 3:", "50");
+            var letters = /^[0-9]+$/;
+            if(temp.match(letters))
+            {
+            document.getElementById("speedbuttonthree").innerHTML = temp+"ms";
+            var invalue=temp;
+            }else
+            {
+                alert('invalid input');
+            }
+            break;
+            case "4":
+            var temp=prompt("Millisekunden von 4:", "50");
+            var letters = /^[0-9]+$/;
+            if(temp.match(letters))
+            {
+            document.getElementById("speedbuttonfour").innerHTML = temp+"ms";
+            var invalue=temp;
+            }else
+            {
+                alert('invalid input');
+            }
+            break;
+            case "5":
+            var temp=prompt("Millisekunden von 5:", "50");
+            var letters = /^[0-9]+$/;
+            if(temp.match(letters))
+            {
+            document.getElementById("speedbuttonfive").innerHTML = temp+"ms";
+            var invalue=temp;
+            }else
+            {
+                alert('invalid input');
+            }
+            break;
+            default: 
+            break;
+        }
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/buttonValues?value="+invalue+"&buttonN="+buttonnumber, true);
+    xhr.send();
+    }
+    function checkboxValueChanged()
+    {
+      var xhr = new XMLHttpRequest();
+      if(document.getElementById("summer").checked == true)
+      {
+        xhr.open("GET", "/summertime?value=true", true);
+      }
+      else
+      {
+        xhr.open("GET", "/summertime?value=false", true);
+      }
+      xhr.send();
+    }
+    function checkboxAutomatic()
+    {
+      var xhr = new XMLHttpRequest();
+      if(document.getElementById("automaticSwitch").checked == true)
+      {
+        xhr.open("GET", "/automatic?value=true", true);
+      }
+      else
+      {
+        xhr.open("GET", "/automatic?value=false", true);
+      }
+      xhr.send();
+    }
+    function sendStatusServoWaiting()
+    {
+      var xhr = new XMLHttpRequest();
+      if(document.getElementById("servooffduringwaitingSwitch").checked == true)
+      {
+        xhr.open("GET", "/servowaiting?value=true", true);
+      }
+      else
+      {
+        xhr.open("GET", "/servowaiting?value=false", true);
+      }
+      xhr.send();
+    }
+    function reqListener()
+    {
+      document.getElementById("actualTime").innerHTML = this.responseText;
+    }
+    function updateClock()
+    {
+      var xhr = new XMLHttpRequest();
+      xhr.addEventListener("load",reqListener);
+      xhr.open("GET", "/timeRequestPackage", true);
+      xhr.send();
+    }
+    document.addEventListener('visibilitychange', function (event) {
+    if (document.hidden) {
+        clearInterval(handle);
+    } else {
+        document.location.reload(true)
+    }
+    });
+    var handle=setInterval(updateClock, 1000);
+    var startTime = document.getElementById("userInputBeginn");
+    startTime.addEventListener("input", function() {
+    var xhr = new XMLHttpRequest();
+    if((!userInputBeginn.value==""))
+    {
+    xhr.open("GET", "/startTime?value="+String(userInputBeginn.value), true);
+    xhr.send();
+    }
+    }, true);
+    var endTime = document.getElementById("userInputEnd");
+    endTime.addEventListener("input", function() {
+    var xhr = new XMLHttpRequest();
+    if((!userInputEnd.value==""))
+    {
+    xhr.open("GET", "/endTime?value="+String(userInputEnd.value), true);
+    xhr.send();
+    }
+    }, true);
+    var postionBrake = document.getElementById("tentacles");
+    postionBrake.addEventListener("input", function() {
+    var xhr = new XMLHttpRequest();
+    if((tentacles.value)>=0 && (tentacles.value)<=180)
+    {
+      if(Math.abs(Math.round(tentacles.value))<=180)
+      {
+        xhr.open("GET", "/positionBrake?value="+String(Math.abs(Math.round(tentacles.value))), true);
+        xhr.send(); 
+      }
+    }
+    else
+    {
+      console.log("invalid input");
+    }
+    }, true);
+
+    var Hallsensoren = document.getElementById("hallinput");
+    Hallsensoren.addEventListener("input", function() {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/hallsensor?value="+String(hallinput.value), true);
+    xhr.send();
+    document.getElementById("onoff").checked = false; 
+    }, true);
+    
+    </script>
+</body>
+</html>
