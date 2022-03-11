@@ -16,7 +16,7 @@
 #define enablepin 13 // D7
 #define motorInterfaceType 1
 AccelStepper stepper = AccelStepper(motorInterfaceType, stepPin, dirPin);
-Adafruit_ADS1115 ads;
+//Adafruit_ADS1115 ads;
 WiFiUDP ntpUDP;
 // NTPClient timeClient(ntpUDP,"fritz.box", 36000, 60000);
 NTPClient timeClient(ntpUDP, "pool.ntp.org", 36000, 60000);
@@ -49,6 +49,7 @@ String getValue(String data, char separator, int index)
 }
 
 const int led = 2;
+const int limitSwitchPin = 5; //D1 //10k to 3,3Vcc
 int addr = 0;
 char eeprom[1000] = "";
 char *pointer = eeprom;
@@ -243,9 +244,9 @@ const char index_html[] PROGMEM = R"rawliteral(
         <div data-role="main" class="ui-content">
             <div data-role="rangeslider">
                 <label for="price-min">Winkel:</label>
-                <input type="range" onchange="setMin()" id="minSlider" name="angle-min" id="angle-min" value="%MINVALUEANGLE%" min="0" max="180">
+                <input type="range" onchange="setMin()" id="minSlider" name="angle-min" id="angle-min" value="%MINVALUEANGLE%" min="0" max="360">
                 <label for="angle-max">Winkel:</label>
-                <input type="range" onchange="setMax()" id="maxSlider" name="angle-max" id="angle-max" value="%MAXVALUEANGLE%"  min="0" max="180">
+                <input type="range" onchange="setMax()" id="maxSlider" name="angle-max" id="angle-max" value="%MAXVALUEANGLE%"  min="0" max="360">
             </div>
         </div>
     </div>
@@ -290,7 +291,7 @@ const char index_html[] PROGMEM = R"rawliteral(
   <div class=inputfieldtext-group id=placeholderBottom>
   <p>An der Position:</p>
   <input type="number" id="tentacles" name="tentacles"
-       min="0" max="180" step="1" value=%BRAKEPOSITION% step=1>
+       min="0" max="360" step="1" value=%BRAKEPOSITION% step=1>
   </div>
   <div class=inputfieldtext-group id=placeholderBottom>
   <label>
@@ -301,11 +302,6 @@ const char index_html[] PROGMEM = R"rawliteral(
   <label>
   <input type="checkbox" id="servooffduringwaitingSwitch" onclick="sendStatusServoWaiting()" name="onoffServo">
   Stepper Abschaltung?</label>
-  </div>
-
-  <div class=inputfieldtext-group id=placeholderBottom>
-  <p>Hallsensoren-Schwelle:</p>
-  <input type="number" id="hallinput" name="hallinput" step="1" value=%HALLSENSOREN% step=1 style="width: 5em;">
   </div>
   
 
@@ -384,7 +380,7 @@ const char index_html[] PROGMEM = R"rawliteral(
     var xhr = new XMLHttpRequest();
     if(Math.sign(value)==1 || Math.sign(value)==+0)
     {
-      if(Math.abs(Math.round(value))<=180)
+      if(Math.abs(Math.round(value))<=360)
       {
         xhr.open("GET", "/sliderMIN?value="+Math.abs(Math.round(value)), true);
         xhr.send();
@@ -401,7 +397,7 @@ const char index_html[] PROGMEM = R"rawliteral(
     var xhr = new XMLHttpRequest();
     if(Math.sign(value)==1 || Math.sign(value)==+0)
     {
-      if(Math.abs(Math.round(value))<=180)
+      if(Math.abs(Math.round(value))<=360)
       {
         xhr.open("GET", "/sliderMAX?value="+Math.abs(Math.round(value)), true);
         xhr.send();
@@ -603,9 +599,9 @@ const char index_html[] PROGMEM = R"rawliteral(
     var postionBrake = document.getElementById("tentacles");
     postionBrake.addEventListener("input", function() {
     var xhr = new XMLHttpRequest();
-    if((tentacles.value)>=0 && (tentacles.value)<=180)
+    if((tentacles.value)>=0 && (tentacles.value)<=360)
     {
-      if(Math.abs(Math.round(tentacles.value))<=180)
+      if(Math.abs(Math.round(tentacles.value))<=360)
       {
         xhr.open("GET", "/positionBrake?value="+String(Math.abs(Math.round(tentacles.value))), true);
         xhr.send(); 
@@ -701,10 +697,11 @@ String processor(const String &var)
 
 void setup()
 {
-  ads.setGain(GAIN_ONE);
-  ads.begin();
+  //ads.setGain(GAIN_ONE);
+  //ads.begin();
 
   pinMode(led, OUTPUT);
+  pinMode(limitSwitchPin, INPUT);
 
   pinMode(enablepin, OUTPUT);
   digitalWrite(led, 0);
@@ -1102,7 +1099,7 @@ void loop()
     stepper.moveTo(calculationFaktor*BrakePosition.toInt());
     if((stepper.currentPosition())>=BrakePosition.toInt())
     {
-      if(ads.readADC_SingleEnded(1)>=magnetLimit.toInt())
+      if(!digitalRead(limitSwitchPin))
       {
         if(!alreadySET_error_compensationLEFT)
         {
@@ -1118,7 +1115,7 @@ void loop()
     }
     else
     {
-      if(ads.readADC_SingleEnded(2)>=magnetLimit.toInt())
+      if(!digitalRead(limitSwitchPin))
       {
         if(!alreadySET_error_compensationRIGHT)
         {
@@ -1151,7 +1148,7 @@ void loop()
     if (direction)
     {
       stepper.moveTo(calculationFaktor * maxValueAngle.toInt());
-      if(ads.readADC_SingleEnded(2)>=magnetLimit.toInt())
+      if(!digitalRead(limitSwitchPin))
       {
         direction=0;
       }
@@ -1160,7 +1157,7 @@ void loop()
     else
     {
       stepper.moveTo(calculationFaktor * minValueAngle.toInt());
-      if(ads.readADC_SingleEnded(1)>=magnetLimit.toInt())
+      if(!digitalRead(limitSwitchPin))
       {
         direction=1;
       }
@@ -1189,7 +1186,7 @@ void loop()
    if(!stepperPositionSet && servoattached)
   {
     stepper.move(-900000);
-    if(ads.readADC_SingleEnded(1)>=magnetLimit.toInt())
+    if(!digitalRead(limitSwitchPin))
     {
       stepperPositionSet=1;
       stepper.setCurrentPosition(0);
@@ -1201,12 +1198,12 @@ void loop()
   if(stepperPositionSet && !rangeSet)
   {
     stepper.move(900000);
-    if(ads.readADC_SingleEnded(2)>=magnetLimit.toInt())
+    if(!digitalRead(limitSwitchPin))
     {
       stepRange=stepper.currentPosition();
       rangeSet=1;
       Serial.println("Rang SET");
-      calculationFaktor=stepRange/180;
+      calculationFaktor=stepRange/360;
     }
   }
 
