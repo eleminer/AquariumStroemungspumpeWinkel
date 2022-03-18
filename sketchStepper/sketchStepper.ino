@@ -103,6 +103,7 @@ unsigned long stepRange = 0;
 bool rangeSet = 0;
 bool alreadySET_error_compensationLEFT=0;
 bool alreadySET_error_compensationRIGHT=0;
+int limitSwitchNumber=1;
 
 AsyncWebServer server(80);
 
@@ -1099,8 +1100,9 @@ void loop()
     stepper.moveTo(calculationFaktor*BrakePosition.toInt());
     if((stepper.currentPosition())>=BrakePosition.toInt())
     {
-      if(!digitalRead(limitSwitchPin))
+      if(!digitalRead(limitSwitchPin) && limitSwitchNumber==1) //number 1
       {
+        limitSwitchNumber=2;
         if(!alreadySET_error_compensationLEFT)
         {
         stepper.setCurrentPosition(0);
@@ -1115,8 +1117,9 @@ void loop()
     }
     else
     {
-      if(!digitalRead(limitSwitchPin))
+      if(!digitalRead(limitSwitchPin) && limitSwitchNumber==2) //number 2
       {
+        limitSwitchNumber=1;
         if(!alreadySET_error_compensationRIGHT)
         {
         stepper.setCurrentPosition(rangeSet);
@@ -1148,18 +1151,20 @@ void loop()
     if (direction)
     {
       stepper.moveTo(calculationFaktor * maxValueAngle.toInt());
-      if(!digitalRead(limitSwitchPin))
+      if(!digitalRead(limitSwitchPin) && limitSwitchNumber==2) //number 2
       {
         direction=0;
+        limitSwitchNumber=1;
       }
 
     }
     else
     {
       stepper.moveTo(calculationFaktor * minValueAngle.toInt());
-      if(!digitalRead(limitSwitchPin))
+      if(!digitalRead(limitSwitchPin) && limitSwitchNumber==1) //number 1
       {
         direction=1;
+        limitSwitchNumber=2;
       }
     }
   }
@@ -1186,24 +1191,26 @@ void loop()
    if(!stepperPositionSet && servoattached)
   {
     stepper.move(-900000);
-    if(!digitalRead(limitSwitchPin))
+    if(!digitalRead(limitSwitchPin) && limitSwitchNumber==1) //number 1
     {
       stepperPositionSet=1;
       stepper.setCurrentPosition(0);
       stepper.moveTo(0);
       Serial.println("zero Position SET");
+      limitSwitchNumber=2;
     }
   }
 
   if(stepperPositionSet && !rangeSet)
   {
     stepper.move(900000);
-    if(!digitalRead(limitSwitchPin))
+    if(!digitalRead(limitSwitchPin) && limitSwitchNumber==2) //number 2
     {
       stepRange=stepper.currentPosition();
       rangeSet=1;
       Serial.println("Rang SET");
       calculationFaktor=stepRange/360;
+      limitSwitchNumber=1;
     }
   }
 
