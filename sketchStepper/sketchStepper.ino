@@ -103,7 +103,8 @@ unsigned long stepRange = 0;
 bool rangeSet = 0;
 bool alreadySET_error_compensationLEFT=0;
 bool alreadySET_error_compensationRIGHT=0;
-int limitSwitchNumber=1;
+int limitSwitchNumber=1; //logic for one limit switch
+bool alreadyChangedNumber=1; //logic for one limit switch
 
 AsyncWebServer server(80);
 
@@ -975,6 +976,21 @@ void setup()
 
 void loop()
 {
+  //----------------------------button logic change---------------------
+  if(digitalRead(limitSwitchPin) && !alreadyChangedNumber)
+  {
+    //please change
+    if(limitSwitchNumber==1)
+    {
+      limitSwitchNumber=2;
+    }
+    else
+    {
+      limitSwitchNumber=1;
+    }
+    alreadyChangedNumber=1;
+  }
+  //----------------------------button logic change---------------------
   if (millis() <= 5000 && !timeisSet)
   {
     timeforSet = true;
@@ -1102,7 +1118,7 @@ void loop()
     {
       if(!digitalRead(limitSwitchPin) && limitSwitchNumber==1) //number 1
       {
-        limitSwitchNumber=2;
+        alreadyChangedNumber=0;
         if(!alreadySET_error_compensationLEFT)
         {
         stepper.setCurrentPosition(0);
@@ -1119,7 +1135,7 @@ void loop()
     {
       if(!digitalRead(limitSwitchPin) && limitSwitchNumber==2) //number 2
       {
-        limitSwitchNumber=1;
+        alreadyChangedNumber=0;
         if(!alreadySET_error_compensationRIGHT)
         {
         stepper.setCurrentPosition(rangeSet);
@@ -1142,10 +1158,12 @@ void loop()
     if ((stepper.currentPosition()) >= (calculationFaktor * maxValueAngle.toInt()))
     {
       direction = 0;
+      alreadyChangedNumber=0;
     }
     if ((stepper.currentPosition()) <= (calculationFaktor * minValueAngle.toInt()))
     {
       direction = 1;
+      alreadyChangedNumber=0;
     }
 
     if (direction)
@@ -1154,7 +1172,7 @@ void loop()
       if(!digitalRead(limitSwitchPin) && limitSwitchNumber==2) //number 2
       {
         direction=0;
-        limitSwitchNumber=1;
+        alreadyChangedNumber=0;
       }
 
     }
@@ -1164,7 +1182,7 @@ void loop()
       if(!digitalRead(limitSwitchPin) && limitSwitchNumber==1) //number 1
       {
         direction=1;
-        limitSwitchNumber=2;
+        alreadyChangedNumber=0;
       }
     }
   }
@@ -1197,7 +1215,7 @@ void loop()
       stepper.setCurrentPosition(0);
       stepper.moveTo(0);
       Serial.println("zero Position SET");
-      limitSwitchNumber=2;
+      alreadyChangedNumber=0;
     }
   }
 
@@ -1210,7 +1228,7 @@ void loop()
       rangeSet=1;
       Serial.println("Rang SET");
       calculationFaktor=stepRange/360;
-      limitSwitchNumber=1;
+      alreadyChangedNumber=0;
     }
   }
 
