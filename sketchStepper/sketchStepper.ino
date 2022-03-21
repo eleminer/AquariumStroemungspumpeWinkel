@@ -1004,12 +1004,12 @@ if(!digitalRead(limitSwitchPin)) // if pin is low, the button is pressed
 
 if(digitalRead(limitSwitchPin))
 {
-  if (waiting_loops_virtual_button<=50)
+  if (waiting_loops_virtual_button<=1000)
   {
       waiting_loops_virtual_button++;
   }
 }
-if(waiting_loops_virtual_button>=49)
+if(waiting_loops_virtual_button>=1000)
 {
   buttonisFree=1;
   virtualLimitSwitch1=0;
