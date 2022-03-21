@@ -103,8 +103,10 @@ unsigned long stepRange = 0;
 bool rangeSet = 0;
 bool alreadySET_error_compensationLEFT=0;
 bool alreadySET_error_compensationRIGHT=0;
-int limitSwitchNumber=1; //logic for one limit switch
-bool alreadyChangedNumber=1; //logic for one limit switch
+bool virtualLimitSwitch1=0;
+bool virtualLimitSwitch2=0;
+bool buttonisFree=1;
+unsigned int waiting_loops_virtual_button=0;
 
 AsyncWebServer server(80);
 
@@ -976,21 +978,45 @@ void setup()
 
 void loop()
 {
-  //----------------------------button logic change---------------------
-  if(digitalRead(limitSwitchPin) && !alreadyChangedNumber)
+if(!digitalRead(limitSwitchPin)) // if pin is low, the button is pressed
+{
+  if(buttonisFree)
   {
-    //please change
-    if(limitSwitchNumber==1)
+    buttonisFree=0;
+    if(stepper.returnDirection())
     {
-      limitSwitchNumber=2;
+      //on the way to A2
+      virtualLimitSwitch2=1;
+      //just for safety
+      virtualLimitSwitch1=0;
     }
     else
     {
-      limitSwitchNumber=1;
+      //on the way to A1
+      virtualLimitSwitch1=1;
+      //just for safety
+      virtualLimitSwitch2=0;
+
     }
-    alreadyChangedNumber=1;
   }
-  //----------------------------button logic change---------------------
+  waiting_loops_virtual_button=0;
+}
+
+if(digitalRead(limitSwitchPin))
+{
+  if (waiting_loops_virtual_button<=50)
+  {
+      waiting_loops_virtual_button++;
+  }
+}
+if(waiting_loops_virtual_button>=49)
+{
+  buttonisFree=1;
+  virtualLimitSwitch1=0;
+  virtualLimitSwitch2=0;
+}
+
+
   if (millis() <= 5000 && !timeisSet)
   {
     timeforSet = true;
@@ -1116,9 +1142,8 @@ void loop()
     stepper.moveTo(calculationFaktor*BrakePosition.toInt());
     if((stepper.currentPosition())>=BrakePosition.toInt())
     {
-      if(!digitalRead(limitSwitchPin) && limitSwitchNumber==1) //number 1
+      if(virtualLimitSwitch1) //SingleEnd1
       {
-        alreadyChangedNumber=0;
         if(!alreadySET_error_compensationLEFT)
         {
         stepper.setCurrentPosition(0);
@@ -1133,9 +1158,8 @@ void loop()
     }
     else
     {
-      if(!digitalRead(limitSwitchPin) && limitSwitchNumber==2) //number 2
+      if(virtualLimitSwitch2) //SingleEnd2
       {
-        alreadyChangedNumber=0;
         if(!alreadySET_error_compensationRIGHT)
         {
         stepper.setCurrentPosition(rangeSet);
@@ -1158,31 +1182,27 @@ void loop()
     if ((stepper.currentPosition()) >= (calculationFaktor * maxValueAngle.toInt()))
     {
       direction = 0;
-      alreadyChangedNumber=0;
     }
     if ((stepper.currentPosition()) <= (calculationFaktor * minValueAngle.toInt()))
     {
       direction = 1;
-      alreadyChangedNumber=0;
     }
 
     if (direction)
     {
       stepper.moveTo(calculationFaktor * maxValueAngle.toInt());
-      if(!digitalRead(limitSwitchPin) && limitSwitchNumber==2) //number 2
+      if(virtualLimitSwitch2) //SingleEnd2
       {
         direction=0;
-        alreadyChangedNumber=0;
       }
 
     }
     else
     {
       stepper.moveTo(calculationFaktor * minValueAngle.toInt());
-      if(!digitalRead(limitSwitchPin) && limitSwitchNumber==1) //number 1
+      if(virtualLimitSwitch1) //SingleEnd1
       {
         direction=1;
-        alreadyChangedNumber=0;
       }
     }
   }
@@ -1209,26 +1229,24 @@ void loop()
    if(!stepperPositionSet && servoattached)
   {
     stepper.move(-900000);
-    if(!digitalRead(limitSwitchPin) && limitSwitchNumber==1) //number 1
+    if(virtualLimitSwitch1) //SingleEnd1
     {
       stepperPositionSet=1;
       stepper.setCurrentPosition(0);
       stepper.moveTo(0);
       Serial.println("zero Position SET");
-      alreadyChangedNumber=0;
     }
   }
 
   if(stepperPositionSet && !rangeSet)
   {
     stepper.move(900000);
-    if(!digitalRead(limitSwitchPin) && limitSwitchNumber==2) //number 2
+    if(virtualLimitSwitch2) //SingleEnd2
     {
       stepRange=stepper.currentPosition();
       rangeSet=1;
       Serial.println("Rang SET");
       calculationFaktor=stepRange/360;
-      alreadyChangedNumber=0;
     }
   }
 
